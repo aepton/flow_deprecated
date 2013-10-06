@@ -1,0 +1,168 @@
+body {
+  background: #fff;
+  color: #000;
+  font-family: Helvetica;
+  height: auto;
+  padding-bottom: 0px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-weight: normal;
+  padding-top: 20px;
+  text-align: center;
+}
+
+h2 {
+  padding-top: 20px;
+  text-align: center;
+}
+
+p {
+  border: 1px solid black;
+  overflow: hidden;
+  padding: 5px 0;
+  text-align: center;
+}
+
+.container_16 {
+  background-color: #fff;
+  background-repeat: repeat-y;
+  margin-bottom: 20px;
+}
+
+#round_title {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  margin-bottom: 0px;
+  position: fixed;
+  width: 98.2%;
+  z-index: 5;
+}
+
+#topic {
+  background-color: #fff;
+  color: #000;
+  border: 5px solid black;
+  font-weight: bold;
+  font-size: 2em;
+  position: fixed;
+  margin-top: 1em;
+  text-align: center;
+  z-index: 5;
+}
+
+#new_topic {
+  font-style: italic;
+}
+
+#header {
+  position: fixed;
+  border: none;
+  margin-top: 6.5em;
+  margin-bottom: none;
+  width: 100%;
+  z-index: 5;
+}
+
+#background_blocker {
+  position: fixed;
+  background-image: url('/img/white.gif');
+  height: 12%;
+  width: 100%;
+  z-index: 3;
+}
+
+#cards {
+  margin-top: 10em;
+  z-index: 2;
+}
+
+.debate_cell {
+  font-weight: bold;
+  padding: 0px;
+}
+
+.aff {
+  background-color: #fff;
+  color: #000;
+}
+
+.neg {
+  background-color: #000;
+  color: #fff;
+}
+
+.cite {
+  font-style: italic;
+  border: 1px solid black;
+  margin-top: -20px;
+  border-top: none;
+  font-variant: small-caps;
+}
+
+.cite.neg {
+  border-top: 1px solid white;
+}
+
+#header p {
+  width: 100%;
+}
+
+#header div {
+  height: 1em;
+  width: 10.5%;
+  padding: 0px;
+}
+
+.endpoint {
+  height: 50px;
+  width: 10px;
+  z-index: 1;
+}
+
+.new_card {
+  background-color: #ccc;
+}
+
+#console {
+  background-color: gray;
+  color: black;
+  font-weight: bold;
+  font-variant: small-caps;
+}
+
+.unsafe_warning {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  font-variant: small-caps;
+  position: fixed;
+  top: 5px;
+  z-index: 15;
+}
+
+#left_warning {
+  left: 20px;
+}
+
+#right_warning {
+  right: 20px;
+  text-align: right;
+}
+
+.cardNum {
+  position: absolute;
+  margin-top: -1.6%;
+  margin-left: 9%;
+  color: #777;
+}

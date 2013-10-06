@@ -1,0 +1,32 @@
+application: flowcx
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+  
+- url: /960/css
+  static_dir: 960/css
+
+- url: /css
+  static_dir: css
+
+- url: /formalize
+  static_dir: formalize
+
+- url: /img
+  static_dir: img
+
+- url: /js
+  static_dir: js
+
+- url: .*
+  script: main.app
+
+libraries:
+- name: webapp2
+  version: "2.5.1"
