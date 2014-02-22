@@ -38,4 +38,4 @@ Both the app and the website rely on a still-in-flux and to-be-named format (any
                 "1n":"1n",
                 "2n":"2n"
             }
-        }
+    }

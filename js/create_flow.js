@@ -8,7 +8,15 @@ var topics = {};
 var current_flow_path = '';
 
 // Set up models for backbone
-var Card = Backbone.Model.extend();
+var Card = Backbone.Model.extend({
+    text: '',
+    cite: '',
+    speech: '',
+    cardNum: -1,
+    topicId: -1,
+    roundId: -1,
+    cardId: -1
+});
 var Cards = Backbone.Collection.extend();
 var Topic = Backbone.Model.extend();
 var All_Cards = new Cards();
@@ -74,12 +82,13 @@ function saveCard (speech) {
     // Extract text and citation
     var text = $("#new_card_box_" + speech).val();
     if (!text.length) {
+        console.log('No text length');
         setUpNewCardBox(speech);
         return;
     }
     var cite_loc = text.indexOf('\\');
     var cite = '';
-    if (cite_loc != -1){
+    if (cite_loc != -1) {
         cite = text.substr(cite_loc + 1, text.length);
         text = text.substr(0, cite_loc);
     }
@@ -170,9 +179,8 @@ function syncToS3() {
     xhr.open('PUT', 'http://myflo.ws.s3.amazonaws.com/rounds/' + currentRoundId, true);
     xhr.setRequestHeader('Content-Type', 'application/jsonp;charset=UTF-8');
     xhr.setRequestHeader('x-amz-grant-read', 'uri=http://acs.amazonaws.com/groups/global/AllUsers');
-    xhr.setRequestHeader('x-amz-grant-full-control', 'id=232e57676375e3662e1f6071e27ba830d61a56435635409a02da101abffa7e30');
     xhr.send('f(' + JSON.stringify(to_sync) + ');');
-    $('#rnd-link').html('<a target="_blank" href="http://myflo.ws/view?rnd=' + currentRoundId + '">http://myflo.ws/view?rnd=' + file_path + '</a>');
+    $('#rnd-link').html('<a target="_blank" href="http://myflo.ws/view?rnd=' + currentRoundId + '">http://myflo.ws/view?rnd=' + currentRoundId + '</a>');
     $('#saved_round').modal();
 }
 
