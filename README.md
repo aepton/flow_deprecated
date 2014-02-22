@@ -1,4 +1,4 @@
-Javascript-based flowing app for cross-ex policy debate. This repo contains both the code for the app itself, and the code for myflo.ws, the website that allows flows to be shared and commented upon.
+Javascript-based flowing app for cross-ex policy debate. This repo contains both the code for the app itself, and the code for [myflo.ws](http://myflo.ws), the website that allows flows to be shared and commented upon.
 
 Both the app and the website rely on a still-in-flux and to-be-named format (any suggestions? Was thinking .db8 but that's lame) that's basically JSON:
 
