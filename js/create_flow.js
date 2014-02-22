@@ -9,16 +9,16 @@ var current_flow_path = '';
 
 // Set up models for backbone
 var Card = Backbone.Model.extend({
-    text: '',
-    cite: '',
-    speech: '',
-    cardNum: -1,
-    topicId: -1,
-    roundId: -1,
-    cardId: -1
+    sync: function() {
+        console.log('syncing', this);
+    }
 });
 var Cards = Backbone.Collection.extend();
-var Topic = Backbone.Model.extend();
+var Topic = Backbone.Model.extend({
+    sync: function() {
+        console.log('syncing', this);
+    }
+});
 var All_Cards = new Cards();
 
 function addTopic() {
@@ -82,7 +82,6 @@ function saveCard (speech) {
     // Extract text and citation
     var text = $("#new_card_box_" + speech).val();
     if (!text.length) {
-        console.log('No text length');
         setUpNewCardBox(speech);
         return;
     }
@@ -109,7 +108,6 @@ function saveCard (speech) {
         editCard(currentCard, speech);
     });
 
-    // Create the new card object and send it to the backend
     card = new Card({
         text: text,
         cite: cite,
@@ -121,7 +119,6 @@ function saveCard (speech) {
     });
     card.save();
     All_Cards.add([card]);
-
     setUpNewCardBox(speech);
 }
 
