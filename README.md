@@ -10,16 +10,16 @@ Both the app and the website rely on a still-in-flux and to-be-named format (any
         "cards":
             [
                 {
-                    "text":"Tiefo je fer f fer fre fref r fre  fref re e fer fre f e fr fre fe fr fre fer fer fer fr ef rru fer fe fe ferjf er f",
-                    "cite":"",
+                    "text":"BO recent appt to UN proves admin taking confront approach 2 Ven, driving apart",
+                    "cite":"AFP 13",
                     "speech":"1ac",
                     "cardNum":1,
                     "topicId":1,
                     "roundId":null,
                     "cardId":2
                 }, {
-                    "text":"iefo je fer f fer fre fref r fre  fref re e fer fre f e fr fre fe fr fre fer fer fer fr ef rru fer fe fe ferjf er f",
-                    "cite":"",
+                    "text":"US has no pol 4 guarnt fair Ven electns, demo @ risk",
+                    "cite":"Walser 12",
                     "speech":"1ac",
                     "cardNum":2,
                     "topicId":1,
