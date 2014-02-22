@@ -41,20 +41,7 @@ textarea {
 }
 
 div.container {
-  padding-left: 5%;
-  padding-right: 5%;
-  width: 100%;
-}
-
-div.container#top {
-  position: fixed;
-  background-color: white;
-  height: 139px;
-  z-index: 999;
-}
-
-div.container#card-container {
-  margin-top: 145px;
+  padding: 0 15px;
 }
 
 .container_16 {
@@ -216,6 +203,3 @@ div.container#card-container {
   display: none;
 }
 
-.modal-text {
-  border: 0;
-}

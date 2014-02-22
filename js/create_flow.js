@@ -22,6 +22,11 @@ var Card = Backbone.Model.extend({
   }
 });
 
+var Cards = Backbone.Collection.extend({
+  model: Card
+});
+var All_Cards = new Cards();
+
 var Arrow = Backbone.Model.extend({
   sync: function(method, model) {
     addModelInstanceToDb(model, 'arrows');
@@ -36,7 +41,7 @@ var Topic = Backbone.Model.extend({
 
 function addModelInstanceToDb(model, osName) {
   if(!canSaveToDB){
-    console('Sorry, cannot sync ' + osName + ' to db yet');
+    console_vis('Sorry, cannot sync ' + osName + ' to db yet');
     return;
   }
   var objectStore = $.indexedDB(dbName).objectStore(osName);
@@ -44,99 +49,22 @@ function addModelInstanceToDb(model, osName) {
   
   // Success callback
   promise.done(function(result, event) {
-    console('Success saving ' + osName + ' ' + JSON.stringify(model) + ': ' + result + '; ' + event);
+    console_vis('Success saving ' + osName + ' ' + JSON.stringify(model) + ': ' + result + '; ' + event);
   });
   promise.onsuccess = function(result, event) {
-    console('Success saving ' + osName + ' ' + JSON.stringify(model) + ': ' + result + '; ' + event);
+    console_vis('Success saving ' + osName + ' ' + JSON.stringify(model) + ': ' + result + '; ' + event);
   }
 
   // Failure callback
   promise.fail(function(error, event) {
-    console('Failure saving ' + osName + ' ' + JSON.stringify(model) + ': ' + error + '; ' + event);
+    console_vis('Failure saving ' + osName + ' ' + JSON.stringify(model) + ': ' + error + '; ' + event);
   });
   promise.onerror = function(error, event) {
-    console('Failure saving ' + osName + ' ' + JSON.stringify(model) + ': ' + error + '; ' + event);
+    console_vis('Failure saving ' + osName + ' ' + JSON.stringify(model) + ': ' + error + '; ' + event);
   }
-
 }
 
-$(document).ready(function () {
-  processParams();
-  openDB();
-  console(currentRoundId);
-	$(".fancybox").fancybox();
-	jsPlumb.importDefaults({
-  	Anchor: "Continuous",
-  	ConnectionsDetachable: true,
-  	Connector: "Straight",
-  	ConnectorZIndex: 1,
-  	LogEnabled: true,
-  	MaxConnections: 10	
-	});
-	//$.fancybox.open([{href: "/html/in_round/newround.html", type: "iframe"}]);
-	//$('.card').each(createArrow);
-	$( window ).bind('keypress', function(e){
-    if ( e.keyCode == 13 ) {
-      e.preventDefault();
-      if (inNewCard){
-        saveCard(currentSpeech);
-      } else {
-        newCard(currentSpeech);  
-      }
-    }
-  });
-
-  $.fancybox.open([{href: "/html/in_round/newtopic.html", type: "iframe"}]);
-  
-  // Handle user selection of different topic
-  $("#topic").change(function (){
-    var selected = $(this).children(":selected").attr("value");
-    if (selected == "new") {
-      $.fancybox.open([{href: "/html/in_round/newtopic.html", type: "iframe"}]);
-    } else {
-      jumpTopic(selected);
-    }
-  });
-  
-  // Handle user selection of different speech
-  setSpeech('1ac');
-  $(".speechhed").click(function(event) {
-    var card_id = event.target.id;
-    console('New card for ' + card_id + ', passing ' + card_id.substr(4));
-    if(card_id.indexOf("new_") != -1){
-      newCard(card_id.substr(4));
-    }
-    console('Setting speech to ' + card_id);
-    setSpeech(card_id);
-  });
-
-  $("#newround").submit(function(ev) {
-    console('PNR!');
-    processNewRound(ev);
-  });
-  
-  // Handle changes to current round
-  chrome.storage.onChanged.addListener(function(changes, namespace) {
-    console('Change detected: cRI=' + changes['currentRoundId'] + ', cTN=' + changes['currentTopicName']);
-    console(Object.keys(changes));
-    if(changes['currentRoundInfo']){
-      currentRoundId = 0;// changes['currentRoundId'].newValue;
-      console('New currentRoundId is ' + currentRoundId);
-      processNewRound();
-      $.fancybox.open([{href: "/html/in_round/newtopic.html", type: "iframe"}]);
-      console('New currentTopicName is ' + currentTopicName);
-    }
-    if(changes['currentTopicName']){
-      currentTopicName = changes['currentTopicName'].newValue;
-      console('New currentTopicName is ' + currentTopicName);
-      addTopic();
-    }
-    console('Done with changes');
-  });
-  console('Done with main');
-});
-
-function console(newLine) {
+function console_vis(newLine) {
   consoleText.push(newLine);
   if(!consoleIsEnabled){
     return;
@@ -161,12 +89,12 @@ function processParams() {
 function openDB() {
   // Set up indexedDB for round metadata
   //$.indexedDB('Debates').deleteDatabase();
-  console('Setting up db...');
+  console_vis('Setting up db...');
   dbOpenPromise = $.indexedDB(dbName, {
     'version': 1,
     'schema': {
       '1': function(transaction) {
-        console('In Schema v1');
+        console_vis('In Schema v1');
         var cards = transaction.createObjectStore('cards', {
           'keyPath': 'cardId',
           'autoIncrement': true
@@ -186,16 +114,16 @@ function openDB() {
   });
 
   dbOpenPromise.progress(function(db, event) {
-    console('Warning: ' + event.type + ' on db open');
+    console_vis('Warning: ' + event.type + ' on db open');
   });
 
   dbOpenPromise.done(function() {
-    console('Done opening db...');
+    console_vis('Done opening db...');
     enableCardSaving();
   });
   
   dbOpenPromise.fail(function(error, event) {
-    console('Error: ' + event.type + ', ' + error);
+    console_vis('Error: ' + event.type + ', ' + error);
   });
 }
 
@@ -203,16 +131,16 @@ function enableCardSaving() {
   canSaveToDB = true;
   $(".new_card").click(function(event) {
     var card_id = event.target.id;
-    console('New card for ' + card_id + ', passing ' + card_id.substr(4));
+    console_vis('New card for ' + card_id + ', passing ' + card_id.substr(4));
     if(card_id.indexOf("new_") != null){
       newCard(card_id.substr(4));
     }
   });
-  console('Saving to db enabled, connection successfully opened');
+  console_vis('Saving to db enabled, connection successfully opened');
 }
 
 function processNewRound() {
-    console('proccessing new round');
+    console_vis('proccessing new round');
   //var objectStore = $.indexedDB(dbName).objectStore('rounds');
   //var roundPromise = objectStore.get(currentRoundId);
   //var result = storage.get('currentRoundInfo');
@@ -220,10 +148,10 @@ function processNewRound() {
   
   //roundPromise.done(function(result, event) {
   storage.get('currentRoundInfo', function(result) {
-      console('Got results');
-      console(Object.keys(result));
-      console(Object.keys(result['currentRoundInfo']));
-      console(result['affSchool']);
+      console_vis('Got results');
+      console_vis(Object.keys(result));
+      console_vis(Object.keys(result['currentRoundInfo']));
+      console_vis(result['affSchool']);
       result = result['currentRoundInfo'];
     $('#create_affschool').html(result['affSchool']);
     $('#create_affteam').html(result['affTeam']);
@@ -235,7 +163,7 @@ function processNewRound() {
     $('#create_2n').html(result['2n']);
   });
   //roundPromise.fail(function(error, event) {
-  //  console('Error' + error + ': could not get round data; ' + event);
+  //  console_vis('Error' + error + ': could not get round data; ' + event);
   //});
 }
 
@@ -269,7 +197,7 @@ function jumpTopic(topicname) {
 }
 
 function createArrow(card_id) {
-  console('Creating arrow for ' + card_id);
+  console_vis('Creating arrow for ' + card_id);
   var endPtOpts = { isSource:true, isTarget:true, connector: "Straight", maxConnections: 10, connectorOverlays: [
     [ "Arrow", { width: 25, length: 15, location: 1.0, id: "arrow" }],
     [ "Label", { } ]]}; 
@@ -291,33 +219,33 @@ function newCard (speech) {
   setSpeech(speech);
   inNewCard = true;
   var boxId = "new_card_box_" + speech;
-  console('Creating box ' + boxId);
+  console_vis('Creating box ' + boxId);
   
   if (!$("#" + boxId).length) {
     $("#new_" + speech).replaceWith('<textarea id="' + boxId + '"></textarea>');
     $("#" + boxId).focus();
     $("#" + boxId).focusout(function () { saveCard(speech); });
   } else {
-    console('hm, card text...');
+    console_vis('hm, card text...');
   }
 }
 
 function editCard (card_id, speech) {
   setSpeech(speech);
   inNewCard = true;
-  console('Editing box ' + card_id);
+  console.log('Editing box ' + card_id);
   
   if ($("#" + card_id).html().length) {
     var existing_contents = $("#" + card_id).html();
-    if ($("#" + card_id + "_cite").html().length) {
+    if ($("#" + card_id + "_cite").length) {
       existing_contents += "\\" + $("#" + card_id + "_cite").html();
     }
-    console('Existing contents: ' + existing_contents);
+    console.log('Existing contents: ' + existing_contents);
     $("#" + card_id).replaceWith('<textarea id="' + card_id + '">' + existing_contents + '</textarea>');
     $("#" + card_id).focus();
-    $("#" + card_id).focusout(function () { saveCard(speech); });
+    //$("#" + card_id).focusout(function () { saveCard(speech); });
   } else {
-    console('hm, card text...');
+    console.log('hm, card text...');
   }
 }
 
@@ -327,7 +255,7 @@ function saveCard (speech) {
   // Extract text and citation
   var text = $("#new_card_box_" + speech).val();
     if (!text.length) {
-    console('no card text');
+    console_vis('no card text');
     setUpNewCardBox(speech);
     return;
   }
@@ -343,9 +271,9 @@ function saveCard (speech) {
   var topicId = currentTopicId;
   var cardId = "#new_card_box_" + speech;
 
-  $(cardId).parent().append('<p class="debate_cell card topic' + topicId + ' ' + currentTeam + '" id="' + currentCard + '" contenteditable="true">' + text + '</p><span class="cardNum">' + (currentCard - 1) + '</span>');
+  $(cardId).parent().append('<p class="debate_cell card topic' + topicId + ' ' + currentTeam + '" id="' + currentCard + '">' + text + '</p><span class="cardNum">' + (currentCard - 1) + '</span>');
   if (cite_loc != -1){
-    $(cardId).parent().append('<p class="debate_cell topic' + topicId + ' ' + currentTeam + ' cite" id="' + currentCard + '_cite" contenteditable="true">' + cite + '</p>');
+    $(cardId).parent().append('<p class="debate_cell topic' + topicId + ' ' + currentTeam + ' cite" id="' + currentCard + '_cite">' + cite + '</p>');
     $("#" + currentCard + "_cite").click(function(event) {
       editCard(currentCard, speech);
     });
@@ -365,6 +293,7 @@ function saveCard (speech) {
     cardId: currentCard
   });
   card.save();
+  All_Cards.add([card]);
   
   setUpNewCardBox(speech);
 }
@@ -380,7 +309,7 @@ function setUpNewCardBox(speech) {
 
 function setSpeech (speech) {
   currentSpeech = speech;
-  console('Just set speech to ' + speech);
+  console_vis('Just set speech to ' + speech);
   if (speech.indexOf('n') != -1){
     currentTeam = 'neg';
   } else {
@@ -389,6 +318,149 @@ function setSpeech (speech) {
   $(".speechhed.aff").css({'background-color': 'white'});
   $(".speechhed.neg").css({'background-color': 'black'});
   $(".grid_2").css({'background-color': 'white'});
-  $(".grid_2." + speech).css({'background-color': '#eee'});
-  $(".speechhed." + speech).css({'background-color': '#eee'});
+  $(".grid_2." + speech).css({'background-color': '#5cb85c'});
+  $(".speechhed." + speech).css({'background-color': '#5cb85c'});
 }
+
+function getRoundInfo() {
+  var round_info = {
+    'affSchool': $('#create_affschool').text(),
+    'affTeam': $('#create_affteam').text(),
+    '1a': $('#create_1a').text(),
+    '2a': $('#create_2a').text(),
+    'negSchool': $('#create_negschool').text(),
+    'negTeam': $('#create_negteam').text(),
+    '1n': $('#create_1n').text(),
+    '2n': $('#create_2n').text(),
+  }
+  return round_info;
+}
+
+function generateRandomPath() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for( var i=0; i < 20; i++ )
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  return text;
+}
+
+function syncToS3() {
+  var to_sync = {
+    'topics': topics,
+    'cards': All_Cards,
+    'round': getRoundInfo()
+  }
+  var xhr = new XMLHttpRequest();
+  var file_path = generateRandomPath();
+  xhr.open('PUT', 'http://myflo.ws.s3.amazonaws.com/rounds/' + file_path, true);
+  xhr.setRequestHeader('Content-Type', 'application/jsonp;charset=UTF-8');
+  xhr.setRequestHeader('x-amz-grant-read', 'uri=http://acs.amazonaws.com/groups/global/AllUsers');
+  xhr.setRequestHeader('x-amz-grant-full-control', 'id=232e57676375e3662e1f6071e27ba830d61a56435635409a02da101abffa7e30');
+  xhr.send('f(' + JSON.stringify(to_sync) + ');');
+  console.log(xhr);
+  $('#rnd-link').html('<a target="_blank" href="http://myflo.ws/view?rnd=' + file_path + '">http://myflo.ws/view?rnd=' + file_path + '</a>');
+  $('#saved_round').modal();
+}
+
+$(document).ready(function () {
+  processParams();
+  openDB();
+  console_vis(currentRoundId);
+	jsPlumb.importDefaults({
+  	Anchor: "Continuous",
+  	ConnectionsDetachable: true,
+  	Connector: "Straight",
+  	ConnectorZIndex: 1,
+  	LogEnabled: true,
+  	MaxConnections: 10	
+	});
+	//$.fancybox.open([{href: "/html/in_round/newround.html", type: "iframe"}]);
+	//$('.card').each(createArrow);
+	$( window ).bind('keypress', function(e){
+    if ( e.keyCode == 13 ) {
+      e.preventDefault();
+      if (inNewCard){
+        saveCard(currentSpeech);
+      } else {
+        newCard(currentSpeech);  
+      }
+    }
+  });
+
+  //$.fancybox.open([{href: "/html/in_round/newtopic.html", type: "iframe"}]);
+  $('#new_topic').modal({
+    keyboard: false,
+    backdrop: 'static'
+  });
+  $('#new_topic_close_button').hide();
+  setTimeout(function() {$('#new_topic_name').focus()},1000);
+  $('#new_topic').keydown(function (e) {
+    if (e.keyCode == 13) {
+      if ($('#new_topic_name').val() != '') {
+        e.preventDefault();
+        currentTopicName = $('#new_topic_name').val();
+        $('#new_topic').modal('hide');
+        $('#new_topic_name').val('');
+        addTopic();
+      } else {
+        e.preventDefault();
+      }
+    }
+  });
+  $('#new_topic_button').click(function() {
+    $('#new_topic').modal({
+      keyboard: true,
+      backdrop: true
+    });
+    $('#new_topic_close_button').show();
+    setTimeout(function() {$('#new_topic_name').focus()},750);
+  });
+
+  $('#sync_button').click(function() {
+    $('#sync_button').toggleClass('btn-primary btn-success');
+    syncToS3();
+  });
+  
+  // Handle user selection of different topic
+  $("#topic").change(function (){
+    var selected = $(this).children(":selected").attr("value");
+    jumpTopic(selected);
+  });
+  
+  // Handle user selection of different speech
+  setSpeech('1ac');
+  $(".speechhed").click(function(event) {
+    var card_id = event.target.id;
+    console_vis('New card for ' + card_id + ', passing ' + card_id.substr(4));
+    if(card_id.indexOf("new_") != -1){
+      newCard(card_id.substr(4));
+    }
+    console_vis('Setting speech to ' + card_id);
+    setSpeech(card_id);
+  });
+
+  $("#newround").submit(function(ev) {
+    console_vis('PNR!');
+    processNewRound(ev);
+  });
+  
+  // Handle changes to current round
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    console_vis('Change detected: cRI=' + changes['currentRoundId'] + ', cTN=' + changes['currentTopicName']);
+    console_vis(Object.keys(changes));
+    if(changes['currentRoundInfo']){
+      currentRoundId = 0;// changes['currentRoundId'].newValue;
+      console_vis('New currentRoundId is ' + currentRoundId);
+      processNewRound();
+      $.fancybox.open([{href: "/html/in_round/newtopic.html", type: "iframe"}]);
+      console_vis('New currentTopicName is ' + currentTopicName);
+    }
+    if(changes['currentTopicName']){
+      currentTopicName = changes['currentTopicName'].newValue;
+      console_vis('New currentTopicName is ' + currentTopicName);
+      addTopic();
+    }
+    console_vis('Done with changes');
+  });
+  console_vis('Done with main');
+});

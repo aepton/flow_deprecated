@@ -3,11 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <title>Flow</title>
-<link rel="stylesheet" href="/960/css/reset.css" />
-<link rel="stylesheet" href="/960/css/text.css" />
-<link rel="stylesheet" href="/960/css/960.css" />
-<link rel="stylesheet" href="/formalize/css/formalize.css" />
-<link rel="stylesheet" href="/fancybox/source/jquery.fancybox.css?v=2.1.2" type="text/css" media="screen" />
+<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
 <link rel="stylesheet" href="/css/create_flow.css" />
 <script type="text/javascript" src="/js/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
@@ -15,15 +11,14 @@
 <script type="text/javascript" src="/formalize/js/jquery.formalize.js"></script>
 <script type="text/javascript" src="/js/underscore.js"></script>
 <script type="text/javascript" src="/js/backbone.js"></script>
-<script type="text/javascript" src="/fancybox/source/jquery.fancybox.pack.js?v=2.1.2"></script>
 <script type="text/javascript" src="/js/purl.js"></script>
 <script type="text/javascript" src="/js/jquery.indexeddb.js"></script>
+<script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/create_flow.js"></script>
 </head>
 <body>
-<div id="background_blocker" class="grid_16"></div>
-<div class="container_16">
-  <div class="grid_16">
+<div id="top" class="container">
+  <div class="row">
     <p id="round_title">
       <span id="create_affschool" contenteditable="true">affSchool</span> <span id="create_affteam" contenteditable="true">affTeam</span> 
       (<span id="create_1a" contenteditable="true">1a</span> & <span id="create_2a" contenteditable="true">2a</span>) aff vs 
@@ -31,87 +26,108 @@
       (<span id="create_1n"contenteditable="true">1n</span> & <span id="create_2n" contenteditable="true">2n</span>) neg
     </p>
   </div>
-  <select id="topic" class="grid_8 push_4">
-    <option value="new"><< NEW ISSUE >></option>
-  </select>
-  <div class="clear"></div>
-  <div id="header">
-    <div class="grid_2">
+  <div class="row">
+    <select id="topic" class="col-md-4 col-md-offset-3">
+    </select>
+    <button type="button" id="new_topic_button" class="btn btn-default col-md-2">New topic</button>
+    <button type="button" id="sync_button" class="btn btn-default col-md-1">Sync</button>
+  </div>
+  <div class="row" id="header">
+    <div class="col-md-1 card-col">
       <p class="debate_cell aff speechhed 1ac" id="1ac">
         1AC
       </p>
     </div>
-    <div class="grid_2">
+    <div class="col-md-1 card-col">
       <p class="debate_cell neg speechhed 1nc" id="1nc">
         1NC
       </p>
     </div>
-    <div class="grid_2">
+    <div class="col-md-1 card-col">
       <p class="debate_cell aff speechhed 2ac" id="2ac">
         2AC
       </p>
     </div>
-    <div class="grid_2">
+    <div class="col-md-1 card-col">
       <p class="debate_cell neg speechhed 2nc" id="2nc">
         2NC
       </p>
     </div>
-    <div class="grid_2">
+    <div class="col-md-1 card-col">
       <p class="debate_cell neg speechhed 1nr" id="1nr">
         1NR
       </p>
     </div>
-    <div class="grid_2">
+    <div class="col-md-1 card-col">
       <p class="debate_cell aff speechhed 1ar" id="1ar">
         1AR
       </p>
     </div>
-    <div class="grid_2">
+    <div class="col-md-1 card-col">
       <p class="debate_cell neg speechhed 2nr" id="2nr">
         2NR
       </p>
     </div>
-    <div class="grid_2">
+    <div class="col-md-1 card-col">
       <p class="debate_cell aff speechhed 2ar" id="2ar">
         2AR
       </p>
     </div>
   </div>
-  <div class="clear"></div>
-  <div id="cards">
-    <div class="grid_2 1ac">
+</div>
+<div class="container" id="card-container">
+  <div class="row" id="cards">
+    <div class="col-md-1 card-col 1ac">
       <p class="aff new_card" id="new_1ac">new card</p>
     </div>
-    <div class="grid_2 1nc">
+    <div class="col-md-1 card-col 1nc">
       <p class="neg new_card" id="new_1nc">new card</p>
     </div>
-    <div class="grid_2 2ac">
-
+    <div class="col-md-1 card-col 2ac">
       <p class="aff new_card" id="new_2ac">new card</p>
     </div>
-    <div class="grid_2 2nc">
+    <div class="col-md-1 card-col 2nc">
       <p class="neg new_card" id="new_2nc">new card</p>
     </div>
-    <div class="grid_2 1nr">
+    <div class="col-md-1 card-col 1nr">
       <p class="neg new_card" id="new_1nr">new card</p>
     </div>
-    <div class="grid_2 1ar">
+    <div class="col-md-1 card-col 1ar">
       <p class="aff new_card" id="new_1ar">new card</p>
     </div>
-    <div class="grid_2 2nr">
+    <div class="col-md-1 card-col 2nr">
       <p class="neg new_card" id="new_2nr">new card</p>
     </div>
-    <div class="grid_2 2ar">
+    <div class="col-md-1 card-col 2ar">
       <p class="aff new_card" id="new_2ar">new card</p>
-    </div>
-    <div class="grid_2">
     </div>
   </div>
 </div>
-<!-- end .container_16 -->
-<div id="console"></div>
-<div class="unsafe_warning" id="right_warning">
-  <a href="mailto:abe@epton.org" style="text-decoration:none;color:black" target="_blank">email author</a>
-</div>
+<div class="modal fade" id="new_topic" tabindex="-1" role="dialog" aria-labelledby="new_topic" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" id="new_topic_close_button" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="new_topic_label">Add new topic</h4>
+      </div>
+      <div class="modal-body">
+       <input type="text" id="new_topic_name" class="form-control" placeholder="Inherency, Federalism, etc - hit enter to save">
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" id="saved_round" tabindex="-1" role="dialog" aria-labelledby="saved_round" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="new_topic_label">Syncing Round</h4>
+      </div>
+      <div class="modal-body">
+        <p class="modal-text">Round saved to <span id="rnd-link"></span></p>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 </body>
 </html>

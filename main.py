@@ -17,6 +17,7 @@
 import webapp2
 from python.in_round import create_flow
 
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.out.write('Hello world!')
@@ -26,5 +27,6 @@ app = webapp2.WSGIApplication([('/', create_flow.Front),
                                ('/create', create_flow.Create),
                                ('/card', create_flow.Card),
                                ('/topic', create_flow.Topic),
-                               ('/view', create_flow.View)],
+                               ('/view', create_flow.View),
+                               ('/sync', create_flow.Sync)],
                               debug=False)

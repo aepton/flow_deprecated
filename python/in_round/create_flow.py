@@ -180,3 +180,7 @@ class Topic(webapp2.RequestHandler):
       topic.topicId = values['topicId']
       topic.roundId = values['roundId']
       topic.put()
+
+class Sync(webapp2.RequestHandler):
+  def get(self):
+    pass
