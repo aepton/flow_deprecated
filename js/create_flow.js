@@ -1,4 +1,5 @@
 var inNewCard = false;
+var inNewTopic = false;
 var currentSpeech = '1ac';
 var currentTeam = 'aff';
 var currentCard = 1;
@@ -6,6 +7,18 @@ var currentTopicId = 1;
 var currentTopicName = '';
 var topics = {};
 var current_flow_path = '';
+var currentArrowBoxId = 0;
+
+var speechOrder = {
+  '1ac': {'next': '1nc', 'prev': ''},
+  '1nc': {'next': '2ac', 'prev': '1ac'},
+  '2ac': {'next': '2nc', 'prev': '1nc'},
+  '2nc': {'next': '1nr', 'prev': '2ac'},
+  '1nr': {'next': '1ar', 'prev': '2nc'},
+  '1ar': {'next': '2nr', 'prev': '1nr'},
+  '2nr': {'next': '2ar', 'prev': '1ar'},
+  '2ar': {'next': '', 'prev': '2nr'},
+}
 
 // Set up models for backbone
 var Card = Backbone.Model.extend({
@@ -56,7 +69,7 @@ function newCard (speech) {
     var boxId = "new_card_box_" + speech;
 
     if (!$("#" + boxId).length) {
-        $("#new_" + speech).replaceWith('<textarea id="' + boxId + '"></textarea>');
+        $("#new_" + speech).replaceWith('<textarea id="' + boxId + '" placeholder="Enter card text. Separate cite with \\"></textarea>');
         $("#" + boxId).focus();
         $("#" + boxId).focusout(function () { saveCard(speech); });
     }
@@ -81,6 +94,7 @@ function saveCard (speech) {
 
     // Extract text and citation
     var text = $("#new_card_box_" + speech).val();
+    console.log(findPos($('#new_card_box_' + speech)[0]));
     if (!text.length) {
         setUpNewCardBox(speech);
         return;
@@ -123,7 +137,7 @@ function saveCard (speech) {
 }
 
 function setUpNewCardBox(speech) {
-    var newHtml = '<p class="' + currentTeam + ' new_card" id="new_' + currentSpeech + '" onclick="">new card</p>';
+    var newHtml = '<p class="' + currentTeam + ' new_card current_arrow_box" id="new_' + currentSpeech + '" onclick="">new card</p>';
     $("#new_card_box_" + speech).parent().append(newHtml);
     $("#new_card_box_" + speech).remove();
     inNewCard = false;
@@ -181,18 +195,129 @@ function syncToS3() {
     $('#saved_round').modal();
 }
 
+function findPos(obj) {
+    var curLeft = curTop = 0;
+    if (obj.offsetParent) {
+        do {
+            curLeft += obj.offsetLeft;
+            curTop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+    }
+    return {x:curLeft, y:curTop};
+}
+
+function arrowBoxMove(dir) {
+    if (dir == 'up' || dir == 'down') {
+        var cards = $('.' + currentSpeech + ' > .topic' + currentTopicId);
+        if (currentArrowBoxId == 'new_' + currentSpeech) {
+            if (dir == 'up') {
+                arrowBoxMoveChangeHighlight(cards[cards.length - 1].id);
+                return;
+            }
+        }
+        for (var i = 0; i < cards.length; i+= 1) {
+            if (cards[i].id == currentArrowBoxId) {
+                if (dir == 'up') {
+                    if (i > 0) {
+                        arrowBoxMoveChangeHighlight(cards[i - 1].id);
+                        return;
+                    }
+                } else {
+                    if (i < (cards.length - 1)) {
+                        arrowBoxMoveChangeHighlight(cards[i + 1].id);
+                        return;
+                    } else if (i == (cards.length - 1)) {
+                        arrowBoxMoveChangeHighlight('new_' + currentSpeech);
+                        return;
+                    }
+                }
+            }
+        }
+    } else if (dir == 'left' || dir == 'right') {
+        console.log('Current offset', $('#' + currentArrowBoxId).offset());
+        var cards = [];
+        if (dir == 'right' && speechOrder[currentSpeech]['next'] != '') {
+            cards = $('.' + speechOrder[currentSpeech]['next'] + '> .topic' + currentTopicId);
+        } else if (dir == 'left' && speechOrder[currentSpeech]['prev'] != '') {
+            cards = $('.' + speechOrder[currentSpeech]['prev'] + '> .topic' + currentTopicId);
+        } else {
+            console.log('cant go any farther');
+            return;
+        }
+        if (!cards.length) {
+            console.log('no cards to see');
+            if (dir == 'right') {
+                arrowBoxMoveChangeHighlight('new_' + speechOrder[currentSpeech]['next']);
+                setSpeech(speechOrder[currentSpeech]['next']);
+            } else {
+                arrowBoxMoveChangeHighlight('new_' + speechOrder[currentSpeech]['prev']);
+                setSpeech(speechOrder[currentSpeech]['prev']);
+            }
+            return;
+        }
+        for (var i = 0; i < cards.length; i+= 1) {
+          console.log($('#' + cards[i].id).offset());
+        }
+    }
+}
+
+function arrowBoxMoveChangeHighlight(new_id) {
+    $('#' + currentArrowBoxId).removeClass('current_arrow_box');
+    currentArrowBoxId = new_id;
+    $('#' + currentArrowBoxId).addClass('current_arrow_box');
+}
+
 $(document).ready(function () {
     currentRoundId = generateRandomPath();
+    currentArrowBoxId = 'new_1ac';
 
     // Bind enter key to saving current card
-    $(window).bind('keypress', function(e){
-        if (e.keyCode == 13) {
-            e.preventDefault();
-            if (inNewCard){
-                saveCard(currentSpeech);
-            } else {
-                newCard(currentSpeech);
-            }
+    $(document).keydown(function(e) {
+        switch(e.which) {
+            case 13: // enter
+                if (inNewCard){
+                    saveCard(currentSpeech);
+                } else if (inNewTopic) {
+                    if ($('#new_topic_name').val() != '') {
+                        currentTopicName = $('#new_topic_name').val();
+                        $('#new_topic').modal('hide');
+                        $('#new_topic_name').val('');
+                        addTopic();
+                        inNewTopic = false;
+                    }
+                } else {
+                    arrowBoxMoveChangeHighlight('new_' + currentSpeech);
+                    newCard(currentSpeech);
+                }
+                break;
+            case 37: // left
+                if (inNewCard) return;
+                arrowBoxMove('left');
+                break;
+
+            case 38: // up
+                if (inNewCard) return;
+                arrowBoxMove('up');
+                break;
+
+            case 39: // right
+                if (inNewCard) return;
+                arrowBoxMove('right');
+                break;
+
+            case 40: // down
+                if (inNewCard) return;
+                arrowBoxMove('down');
+                break;
+
+            // Exit for other keydown events to be captured
+            default: return;
+        }
+        e.preventDefault();
+        $('#' + currentArrowBoxId).scrollintoview();
+        if ($('#' + currentArrowBoxId).offset().top < (
+            $('#' + currentSpeech).offset().top + $('#' + currentSpeech).height())) {
+            $(window).scrollTop(0);
         }
     });
 
@@ -201,30 +326,19 @@ $(document).ready(function () {
         keyboard: false,
         backdrop: 'static'
     });
+    inNewTopic = true;
 
     $('#new_topic_close_button').hide();
-    setTimeout(function() {$('#new_topic_name').focus()},1000);
-    $('#new_topic').keydown(function (e) {
-        if (e.keyCode == 13) {
-            if ($('#new_topic_name').val() != '') {
-                e.preventDefault();
-                currentTopicName = $('#new_topic_name').val();
-                $('#new_topic').modal('hide');
-                $('#new_topic_name').val('');
-                addTopic();
-            } else {
-                e.preventDefault();
-            }
-        }
-    });
+    setTimeout(function() {$('#new_topic_name').focus()}, 750);
 
     $('#new_topic_button').click(function() {
         $('#new_topic').modal({
             keyboard: true,
             backdrop: true
         });
+        inNewTopic = true;
         $('#new_topic_close_button').show();
-        setTimeout(function() {$('#new_topic_name').focus()},150);
+        setTimeout(function() {$('#new_topic_name').focus()}, 750);
     });
 
     $('#sync_button').click(function() {
@@ -247,4 +361,8 @@ $(document).ready(function () {
         }
         setSpeech(card_id);
     });
+
+    var e0 = jsPlumb.addEndpoint("1ac_col"),
+      e1 = jsPlumb.addEndpoint("1nc_col");
+    jsPlumb.connect({ source:e0, target:e1 });
 });

@@ -12,6 +12,8 @@
 <script type="text/javascript" src="/js/backbone.js"></script>
 <script type="text/javascript" src="/js/purl.js"></script>
 <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/jquery.jsPlumb-1.4.1-all-min.js"></script>
+<script type="text/javascript" src="/js/jquery.scrollintoview.min.js"></script>
 <script type="text/javascript" src="/js/create_flow.js"></script>
 </head>
 <body>
@@ -75,10 +77,10 @@
 </div>
 <div class="container" id="card-container">
   <div class="row" id="cards">
-    <div class="col-md-1 card-col 1ac">
-      <p class="aff new_card" id="new_1ac">new card</p>
+    <div class="col-md-1 card-col 1ac" id="1ac_col">
+      <p class="aff new_card current_arrow_box" id="new_1ac">new card</p>
     </div>
-    <div class="col-md-1 card-col 1nc">
+    <div class="col-md-1 card-col 1nc" id="1nc_col">
       <p class="neg new_card" id="new_1nc">new card</p>
     </div>
     <div class="col-md-1 card-col 2ac">
