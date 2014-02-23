@@ -305,7 +305,8 @@ $(document).ready(function () {
         $('#' + currentArrowBoxId).scrollintoview();
         if ($('#' + currentArrowBoxId).offset().top < (
             $('#' + currentSpeech).offset().top + $('#' + currentSpeech).height())) {
-            $(window).scrollTop(0);
+            // 6 is just for a bit of extra padding
+            $(window).scrollTop($('#' + currentArrowBoxId).offset().top - $('#top').height() - 6);
         }
     });
 
