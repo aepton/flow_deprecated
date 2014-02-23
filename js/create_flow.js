@@ -94,7 +94,6 @@ function saveCard (speech) {
 
     // Extract text and citation
     var text = $("#new_card_box_" + speech).val();
-    console.log(findPos($('#new_card_box_' + speech)[0]));
     if (!text.length) {
         setUpNewCardBox(speech);
         return;
@@ -193,17 +192,6 @@ function syncToS3() {
     xhr.send('f(' + JSON.stringify(to_sync) + ');');
     $('#rnd-link').html('<a target="_blank" href="http://myflo.ws/view?rnd=' + currentRoundId + '">http://myflo.ws/view?rnd=' + currentRoundId + '</a>');
     $('#saved_round').modal();
-}
-
-function findPos(obj) {
-    var curLeft = curTop = 0;
-    if (obj.offsetParent) {
-        do {
-            curLeft += obj.offsetLeft;
-            curTop += obj.offsetTop;
-        } while (obj = obj.offsetParent);
-    }
-    return {x:curLeft, y:curTop};
 }
 
 function arrowBoxMove(dir) {
