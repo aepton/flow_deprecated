@@ -23,13 +23,13 @@ var speechOrder = {
 // Set up models for backbone
 var Card = Backbone.Model.extend({
     sync: function() {
-        console.log('syncing', this);
+        ;
     }
 });
 var Cards = Backbone.Collection.extend();
 var Topic = Backbone.Model.extend({
     sync: function() {
-        console.log('syncing', this);
+        ;
     }
 });
 var All_Cards = new Cards();
@@ -197,24 +197,33 @@ function syncToS3() {
 function arrowBoxMove(dir) {
     if (dir == 'up' || dir == 'down') {
         var cards = $('.' + currentSpeech + ' > .topic' + currentTopicId);
+        // If there aren't any cards, can't move up or down
+        if (!cards.length) {
+            return;
+        }
         if (currentArrowBoxId == 'new_' + currentSpeech) {
             if (dir == 'up') {
+                // Starting from the bottom of the card list
                 arrowBoxMoveChangeHighlight(cards[cards.length - 1].id);
                 return;
             }
         }
+        // Loop through and find the index of the current card
         for (var i = 0; i < cards.length; i+= 1) {
             if (cards[i].id == currentArrowBoxId) {
                 if (dir == 'up') {
+                    // If we're not at the top, go up one
                     if (i > 0) {
                         arrowBoxMoveChangeHighlight(cards[i - 1].id);
                         return;
                     }
                 } else {
+                    // If we're not at the bottom, go down one
                     if (i < (cards.length - 1)) {
                         arrowBoxMoveChangeHighlight(cards[i + 1].id);
                         return;
                     } else if (i == (cards.length - 1)) {
+                        // We're at the bottom, so go to new card box
                         arrowBoxMoveChangeHighlight('new_' + currentSpeech);
                         return;
                     }
@@ -222,18 +231,17 @@ function arrowBoxMove(dir) {
             }
         }
     } else if (dir == 'left' || dir == 'right') {
-        console.log('Current offset', $('#' + currentArrowBoxId).offset());
         var cards = [];
         if (dir == 'right' && speechOrder[currentSpeech]['next'] != '') {
             cards = $('.' + speechOrder[currentSpeech]['next'] + '> .topic' + currentTopicId);
         } else if (dir == 'left' && speechOrder[currentSpeech]['prev'] != '') {
             cards = $('.' + speechOrder[currentSpeech]['prev'] + '> .topic' + currentTopicId);
         } else {
-            console.log('cant go any farther');
+            // Can't go any farther, no more speeches in that direction
             return;
         }
         if (!cards.length) {
-            console.log('no cards to see');
+            // No cards in speech so highlight the create-card box
             if (dir == 'right') {
                 arrowBoxMoveChangeHighlight('new_' + speechOrder[currentSpeech]['next']);
                 setSpeech(speechOrder[currentSpeech]['next']);
@@ -243,8 +251,46 @@ function arrowBoxMove(dir) {
             }
             return;
         }
+        // We know what the speech to highlight is, so set it; while we're at
+        // it, add new-card box to the card list since it's a valid candidate
+        if (dir == 'right') {
+            setSpeech(speechOrder[currentSpeech]['next']);
+            cards.push($('#new_' + currentSpeech)[0]);
+        } else {
+            setSpeech(speechOrder[currentSpeech]['prev']);
+            cards.push($('#new_' + currentSpeech)[0]);
+        }
+        // Now look for the card whose top is closest to the current one
+        var currTop = $('#' + currentArrowBoxId).offset().top;
+        var preTop = postTop = -1;
         for (var i = 0; i < cards.length; i+= 1) {
-          console.log($('#' + cards[i].id).offset());
+            if ($('#' + cards[i].id).offset().top < currTop) {
+                preTop = i;
+            } else if ($('#' + cards[i].id).offset().top == currTop) {
+                // The cards are in the exact same position, so just pick this
+                arrowBoxMoveChangeHighlight(cards[i].id);
+                return;
+            } else {
+                postTop = i;
+                // We must have one before and one after now, so we're done
+                break;
+            }
+        }
+        // If we never found one below the current card, pick the lowest card
+        // from the next speech
+        if (postTop == -1) {
+            arrowBoxMoveChangeHighlight(cards[preTop].id);
+            return;
+        } else {
+            // Pick the card with smallest distance between current card top
+            // and it's top; if a tie, go with the lower one (arbitrary)
+            var preDist = currTop - $('#' + cards[preTop].id).offset().top;
+            var postDist = $('#' + cards[postTop].id).offset().top - currTop;
+            if (preDist < postDist) {
+                arrowBoxMoveChangeHighlight(cards[preTop].id);
+            } else {
+                arrowBoxMoveChangeHighlight(cards[postTop].id);
+            }
         }
     }
 }
@@ -303,10 +349,14 @@ $(document).ready(function () {
         }
         e.preventDefault();
         $('#' + currentArrowBoxId).scrollintoview();
-        if ($('#' + currentArrowBoxId).offset().top < (
-            $('#' + currentSpeech).offset().top + $('#' + currentSpeech).height())) {
-            // 6 is just for a bit of extra padding
-            $(window).scrollTop($('#' + currentArrowBoxId).offset().top - $('#top').height() - 6);
+        try {
+            if ($('#' + currentArrowBoxId).offset().top < (
+                $('#' + currentSpeech).offset().top + $('#' + currentSpeech).height())) {
+                // 6 is just for a bit of extra padding
+                $(window).scrollTop($('#' + currentArrowBoxId).offset().top - $('#top').height() - 6);
+            }
+        } catch(err) {
+            ;
         }
     });
 
