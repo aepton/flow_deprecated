@@ -144,6 +144,10 @@ div.container#card-container {
   border: 3px solid #5cb85c !important;
 }
 
+.arrow_base {
+  background-color: #5cb85c !important;
+}
+
 /*.aff {
   background-color: #fff;
   color: #000;

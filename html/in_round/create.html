@@ -23,7 +23,8 @@
       <span id="create_affschool" contenteditable="true">affSchool</span> <span id="create_affteam" contenteditable="true">affTeam</span>
       (<span id="create_1a" contenteditable="true">1a</span> & <span id="create_2a" contenteditable="true">2a</span>) aff vs 
       <span id="create_negschool" contenteditable="true">negSchool</span> <span id="create_negteam" contenteditable="true">negTeam</span>
-      (<span id="create_1n"contenteditable="true">1n</span> & <span id="create_2n" contenteditable="true">2n</span>) neg
+      (<span id="create_1n"contenteditable="true">1n</span> & <span id="create_2n" contenteditable="true">2n</span>) neg:&nbsp;
+      <span id="meta_tournament" contenteditable="true">Tournament</span>&nbsp;(<span id="meta_round" contenteditable="true">Round</span>),&nbsp;<span id="meta_judge" contenteditable="true">Judge</span> judging
     </p>
   </div>
   <div class="row">
@@ -83,22 +84,22 @@
     <div class="col-md-1 card-col 1nc" id="1nc_col">
       <p class="neg new_card" id="new_1nc">new card</p>
     </div>
-    <div class="col-md-1 card-col 2ac">
+    <div class="col-md-1 card-col 2ac" id="2ac_col">
       <p class="aff new_card" id="new_2ac">new card</p>
     </div>
-    <div class="col-md-1 card-col 2nc">
+    <div class="col-md-1 card-col 2nc" id="2nc_col">
       <p class="neg new_card" id="new_2nc">new card</p>
     </div>
-    <div class="col-md-1 card-col 1nr">
+    <div class="col-md-1 card-col 1nr" id="1nr_col">
       <p class="neg new_card" id="new_1nr">new card</p>
     </div>
-    <div class="col-md-1 card-col 1ar">
+    <div class="col-md-1 card-col 1ar" id="1ar_col">
       <p class="aff new_card" id="new_1ar">new card</p>
     </div>
-    <div class="col-md-1 card-col 2nr">
+    <div class="col-md-1 card-col 2nr" id="2nr_col">
       <p class="neg new_card" id="new_2nr">new card</p>
     </div>
-    <div class="col-md-1 card-col 2ar">
+    <div class="col-md-1 card-col 2ar" id="2ar_col">
       <p class="aff new_card" id="new_2ar">new card</p>
     </div>
   </div>
@@ -112,6 +113,73 @@
       </div>
       <div class="modal-body">
        <input type="text" id="new_topic_name" class="form-control" placeholder="Inherency, Federalism, etc - hit enter to save">
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" id="round_meta" tabindex="-1" role="dialog" aria-labelledby="round_meta" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="round_meta_label">Round information</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <input type="text" id="aff_school" class="form-control" placeholder="Affirmative School">
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="aff_team" class="form-control" placeholder="Affirmative Team">
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-md-6">
+            <input type="text" id="aff_speaker_1" class="form-control" placeholder="1st Affirmative Speaker">
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="aff_speaker_2" class="form-control" placeholder="2nd Affirmative Speaker">
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-6">
+            <input type="text" id="neg_school" class="form-control" placeholder="Negative School">
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="neg_team" class="form-control" placeholder="Negative Team">
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-md-6">
+            <input type="text" id="neg_speaker_1" class="form-control" placeholder="1st Negative Speaker">
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="neg_speaker_2" class="form-control" placeholder="2nd Negative Speaker">
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-6">
+            <input type="text" id="tournament_name" class="form-control" placeholder="Tournament">
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="round_number" class="form-control" placeholder="Round">
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+            <input type="text" id="judge_name" class="form-control" placeholder="Judge">
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-md-2 col-md-offset-9">
+            <button type="button" class="btn btn-success" id="round_meta_submit">Start round</button>
+          </div>
+        </div>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

@@ -1,5 +1,6 @@
 var inNewCard = false;
 var inNewTopic = false;
+var inRoundMeta = false;
 var currentSpeech = '1ac';
 var currentTeam = 'aff';
 var currentCard = 1;
@@ -8,6 +9,8 @@ var currentTopicName = '';
 var topics = {};
 var current_flow_path = '';
 var currentArrowBoxId = 0;
+var arrowBaseId = '';
+var arrowBaseSpeech = '';
 
 var speechOrder = {
   '1ac': {'next': '1nc', 'prev': ''},
@@ -166,6 +169,9 @@ function getRoundInfo() {
         'negTeam': $('#create_negteam').text(),
         '1n': $('#create_1n').text(),
         '2n': $('#create_2n').text(),
+        'tournament': $('#meta_tournament').text(),
+        'round': $('#meta_round').text(),
+        'judge': $('#meta_judge').text()
     }
     return round_info;
 }
@@ -301,12 +307,44 @@ function arrowBoxMoveChangeHighlight(new_id) {
     $('#' + currentArrowBoxId).addClass('current_arrow_box');
 }
 
+function saveRoundMetaData() {
+    $('#round_meta').modal('hide');
+    inRoundMeta = false;
+    if ($('#tournament_name').val()) $('#meta_tournament').text($('#tournament_name').val());
+    if ($('#round_number').val()) $('#meta_round').text($('#round_number').val());
+    if ($('#judge_name').val()) $('#meta_judge').text($('#judge_name').val());
+    if ($('#aff_school').val()) $('#create_affschool').text($('#aff_school').val());
+    if ($('#aff_team').val()) $('#create_affteam').text($('#aff_team').val());
+    if ($('#aff_speaker_1').val()) $('#create_1a').text($('#aff_speaker_1').val());
+    if ($('#aff_speaker_2').val()) $('#create_2a').text($('#aff_speaker_2').val());
+    if ($('#neg_school').val()) $('#create_negschool').text($('#neg_school').val());
+    if ($('#neg_team').val()) $('#create_negteam').text($('#neg_team').val());
+    if ($('#neg_speaker_1').val()) $('#create_1n').text($('#neg_speaker_1').val());
+    if ($('#neg_speaker_2').val()) $('#create_2n').text($('#neg_speaker_2').val());
+    // Launch new topic modal
+    $('#new_topic').modal({
+        keyboard: false,
+        backdrop: 'static'
+    });
+    inNewTopic = true;
+
+    $('#new_topic_close_button').hide();
+    $('#new_topic').on('shown.bs.modal', function(e) {
+        $('#new_topic_name').focus();
+    });
+}
+
 $(document).ready(function () {
     currentRoundId = generateRandomPath();
     currentArrowBoxId = 'new_1ac';
 
     // Bind enter key to saving current card
     $(document).keydown(function(e) {
+        if (inRoundMeta) {
+            if (e.which != 13) return;
+            saveRoundMetaData();
+            return;
+        }
         switch(e.which) {
             case 13: // enter
                 if (inNewCard){
@@ -324,23 +362,46 @@ $(document).ready(function () {
                     newCard(currentSpeech);
                 }
                 break;
+            case 32: // space
+                if (inNewCard || inNewTopic) return;
+                if (arrowBaseId == '') {
+                    $('#' + currentArrowBoxId).addClass('arrow_base');
+                    arrowBaseId = currentArrowBoxId;
+                    arrowBaseSpeech = currentSpeech;
+                } else if (arrowBaseId == currentArrowBoxId) {
+                    $('#' + currentArrowBoxId).removeClass('arrow_base');
+                    arrowBaseId = '';
+                    arrowBaseSpeech = '';
+                } else {
+                    console.log('Draw arrow from', arrowBaseId, 'to', currentArrowBoxId);
+                    console.log('Base:', $('#' + arrowBaseId).offset(), 'S:', $('#' + arrowBaseSpeech + '_col').offset());
+                    console.log('Dst:', $('#' + currentArrowBoxId).offset(), 'S:', $('#' + currentSpeech + '_col').offset());
+                    var e0 = jsPlumb.addEndpoint(arrowBaseSpeech + '_col');
+                    var e1 = jsPlumb.addEndpoint(currentSpeech + '_col');
+                    console.log(e0, e1);
+                    jsPlumb.connect({ source:e0, target:e1, connector:['Straight'] });
+                    $('#' + currentArrowBoxId).removeClass('arrow_base');
+                    arrowBaseId = '';
+                    arrowBaseSpeech = '';
+                }
+                break;
             case 37: // left
-                if (inNewCard) return;
+                if (inNewCard || inNewTopic) return;
                 arrowBoxMove('left');
                 break;
 
             case 38: // up
-                if (inNewCard) return;
+                if (inNewCard || inNewTopic) return;
                 arrowBoxMove('up');
                 break;
 
             case 39: // right
-                if (inNewCard) return;
+                if (inNewCard || inNewTopic) return;
                 arrowBoxMove('right');
                 break;
 
             case 40: // down
-                if (inNewCard) return;
+                if (inNewCard || inNewTopic) return;
                 arrowBoxMove('down');
                 break;
 
@@ -360,15 +421,16 @@ $(document).ready(function () {
         }
     });
 
-    // Launch new topic modal immediately
-    $('#new_topic').modal({
+    // Launch round meta modal immediately
+    $('#round_meta').modal({
         keyboard: false,
         backdrop: 'static'
     });
-    inNewTopic = true;
-
-    $('#new_topic_close_button').hide();
-    setTimeout(function() {$('#new_topic_name').focus()}, 750);
+    inRoundMeta = true;
+    $('#round_meta').on('shown.bs.modal', function(e) {
+        $('#aff_school').focus();
+    });
+    $('#round_meta_submit').click(saveRoundMetaData);
 
     $('#new_topic_button').click(function() {
         $('#new_topic').modal({
@@ -400,8 +462,4 @@ $(document).ready(function () {
         }
         setSpeech(card_id);
     });
-
-    var e0 = jsPlumb.addEndpoint("1ac_col"),
-      e1 = jsPlumb.addEndpoint("1nc_col");
-    jsPlumb.connect({ source:e0, target:e1 });
 });

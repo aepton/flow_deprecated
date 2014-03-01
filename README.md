@@ -36,6 +36,9 @@ Both the app and the website rely on a still-in-flux and to-be-named format (any
                 "negSchool":"negSchool",
                 "negTeam":"negTeam",
                 "1n":"1n",
-                "2n":"2n"
+                "2n":"2n",
+                "tournament":"tournament",
+                "round":"round",
+                "judge":"judge"
             }
     }
