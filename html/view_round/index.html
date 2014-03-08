@@ -1,16 +1,124 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="1;url=https://chrome.google.com/webstore/detail/flow/kdmdaakkjopjmnaflpcnbhehfkjpbklh">
-        <script type="text/javascript">
-            window.location.href = "https://chrome.google.com/webstore/detail/flow/kdmdaakkjopjmnaflpcnbhehfkjpbklh"
-        </script>
-        <title>Flow for Policy Debate</title>
-    </head>
-    <body>
-        <!-- Note: don't tell people to `click` the link, just tell them that it is a link. -->
-        If you are not redirected automatically, follow the <a href='https://chrome.google.com/webstore/detail/flow/kdmdaakkjopjmnaflpcnbhehfkjpbklh
-'>link to the Flow app on the Chrome App Store</a>.
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flow for Policy Debate</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/landing.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+   </head>
+  <body>
+
+  <div class="container">
+
+      <!-- Static navbar -->
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">myflo.ws</a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">App</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Flows <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Most Recent</a></li>
+                  <li class="divider"></li>
+                  <li role="presentation" class="dropdown-header">Coming Soon</li>
+                  <li><a href="#">By Tournament</a></li>
+                  <li><a href="#">By School</a></li>
+                  <li><a href="#">By Argument</a></li>
+                  <li><a href="#">Search</a></li>
+                </ul>
+              </li>
+            </ul>
+            <button type="button" class="btn btn-success navbar-btn pull-right">Add to Chrome</button>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </div>
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h1>Flow</h1>
+        <div class="container-fluid">
+          <div class="row">
+            <p>Flow is a free, <a class="link" href="https://github.com/aepton/flow">open-source</a> app for Chrome that helps you flow a policy debate round and share it online.</p>
+          </div>
+          <div class="row">
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+              <!-- Indicators -->
+              <ol class="carousel-indicators">
+                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="3"></li>
+              </ol>
+
+              <!-- Wrapper for slides -->
+              <div class="carousel-inner">
+                <div class="item active">
+                  <img src="/main.png" alt="Main flowing view">
+                </div>
+                <div class="item">
+                  <img src="/meta.png" alt="Round creation view">
+                </div>
+                <div class="item">
+                  <img src="/topic.png" alt="Topic creation view">
+                </div>
+                <div class="item">
+                  <img src="/sync.png" alt="Sync results view">
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+              </a>
+              <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+              </a>
+            </div>
+          </div>
+          <div class="row">
+            <p><a class="btn btn-lg btn-success" href="https://chrome.google.com/webstore/detail/flow/kdmdaakkjopjmnaflpcnbhehfkjpbklh" role="button">Add to Chrome &raquo;</a></p>
+          </div>
+          <div class="row">
+            <p>Created by <a class="link" href="http://twitter.com/aepton">@aepton</a>. Feedback and bug reports always welcome.</p>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-29485819-3', 'myflo.ws');
+      ga('send', 'pageview');
+    </script>
+  </body>
 </html>
