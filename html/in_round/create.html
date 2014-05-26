@@ -11,25 +11,31 @@
 <script type="text/javascript" src="/js/libs/underscore.js"></script>
 <script type="text/javascript" src="/js/libs/backbone.js"></script>
 <script type="text/javascript" src="/js/libs/purl.js"></script>
-<script type="text/javascript" src="/js/libs/jquery.jsPlumb-1.4.1-all-min.js"></script>
 <script type="text/javascript" src="/js/libs/jquery.scrollintoview.min.js"></script>
 <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/libs/raphael-min.js"></script>
+<script type="text/javascript" src="/js/libs/moment.min.js"></script>
 <script type="text/javascript" src="/js/create_flow.js"></script>
 </head>
 <body>
 <div id="top" class="container">
   <div class="row">
     <p id="round_title">
-      <span id="create_affschool" contenteditable="true">affSchool</span> <span id="create_affteam" contenteditable="true">affTeam</span>
-      (<span id="create_1a" contenteditable="true">1a</span> & <span id="create_2a" contenteditable="true">2a</span>) aff vs 
-      <span id="create_negschool" contenteditable="true">negSchool</span> <span id="create_negteam" contenteditable="true">negTeam</span>
-      (<span id="create_1n"contenteditable="true">1n</span> & <span id="create_2n" contenteditable="true">2n</span>) neg:&nbsp;
-      <span id="meta_tournament" contenteditable="true">Tournament</span>&nbsp;(<span id="meta_round" contenteditable="true">Round</span>),&nbsp;<span id="meta_judge" contenteditable="true">Judge</span> judging
+      <span id="create_affschool">affSchool</span> <span id="create_affteam">affTeam</span>
+      (<span id="create_1a">1a</span> & <span id="create_2a">2a</span>) aff vs 
+      <span id="create_negschool">negSchool</span> <span id="create_negteam">negTeam</span>
+      (<span id="create_1n">1n</span> & <span id="create_2n">2n</span>) neg:&nbsp;
+      <span id="meta_tournament">Tournament</span>&nbsp;(<span id="meta_round">Round</span>),&nbsp;<span id="meta_judge">Judge</span> judging
     </p>
   </div>
   <div class="row">
-    <select id="topic" class="col-md-4 col-md-offset-3">
-    </select>
+    <div class="btn-group col-md-4 col-md-offset-2" id="topic-dropdown-parent">
+      <button type="button" id="topic" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        Topics <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" id="topic-dropdown" role="menu">
+      </ul>
+</div>
     <button type="button" id="new_topic_button" class="btn btn-default col-md-2">New topic</button>
     <button type="button" id="sync_button" class="btn btn-default col-md-1">Sync</button>
   </div>
@@ -79,7 +85,7 @@
 <div class="container" id="card-container">
   <div class="row" id="cards">
     <div class="col-md-1 card-col 1ac" id="1ac_col">
-      <p class="aff new_card current_arrow_box" id="new_1ac">new card</p>
+      <p class="aff new_card current_arrow_box arrow_box_newcard" id="new_1ac">new card</p>
     </div>
     <div class="col-md-1 card-col 1nc" id="1nc_col">
       <p class="neg new_card" id="new_1nc">new card</p>
@@ -197,5 +203,22 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<div class="modal fade" id="modal-template" tabindex="-1" role="dialog" aria-labelledby="modal-template" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" id="modal-template_close_button" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="modal-template_label"></h4>
+      </div>
+      <div class="modal-body">
+        <p id="modal-contents"></p>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script type="text/template" id="local-rounds-template">
+  {{ rounds }}
+</script>
+</div>
 </body>
 </html>

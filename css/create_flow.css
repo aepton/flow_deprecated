@@ -30,7 +30,6 @@ h2 {
 }
 
 p {
-  border: 1px solid black;
   overflow: hidden;
   padding: 5px 0;
   text-align: center;
@@ -49,7 +48,7 @@ div.container {
 div.container#top {
   position: fixed;
   background-color: white;
-  height: 139px;
+  height: 130px;
   z-index: 999;
 }
 
@@ -65,7 +64,6 @@ div.container#card-container {
 
 #round_title {
   border: none;
-  font-weight: bold;
   margin-bottom: 0px;
   position: relative;
   width: 90%;
@@ -77,33 +75,52 @@ div.container#card-container {
 #topic {
   background-color: #fff;
   color: #000;
-  border: 5px solid black;
-  font-weight: bold;
-  font-size: 2em;
+  border: 1px solid black;
   text-align: center;
   z-index: 5;
+  width: 100%;
+  font-size: 1.2em;
+  box-shadow: 0 !important;
+  box-shadow: none;
+}
+
+#topic-dropdown-parent.open > #topic {
+  border-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#topic-dropdown {
+  width: 100%;
+  margin-top: 0px;
+  border-top: 0;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  width: 364px;
+  margin-left: 15px;
+}
+
+#topic-dropdown > li > a {
+  text-align: center;
 }
 
 #new_topic_button {
   margin-left: 30px;
-  border-width: 5px;
+  border-width: 1px;
   font-size: 1.2em;
   border-color: #000;
-  font-weight: bold;
   max-height: 45px;
 }
 
 #sync_button {
   margin-left: 30px;
-  border-width: 5px;
+  border-width: 1px;
   font-size: 1.2em;
   border-color: #000;
-  font-weight: bold;
   max-height: 45px;
-}
-
-#new_topic {
-  font-style: italic;
 }
 
 #header {
@@ -136,38 +153,80 @@ div.container#card-container {
 }
 
 .debate_cell {
-  font-weight: bold;
   padding: 0px;
 }
 
 .current_arrow_box {
-  border: 3px solid #5cb85c !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-top: 0 !important;
+  box-shadow: 1px 3px 3px rgba(0, 0, 0, 0.3) !important;
+  padding: 4px 0;
 }
 
 .arrow_base {
-  background-color: #5cb85c !important;
+  background-color: rgba(92, 184, 92, 0.2) !important;
+  box-shadow: 1px 3px 3px rgba(0, 0, 0, 0.3) !important;
+  padding: 4px 0 !important;
 }
 
-/*.aff {
-  background-color: #fff;
-  color: #000;
-}*/
+/*'#428bca', '#f0ad4e', '#5bc0de', '#d9534f'*/
 
-.neg {
-  background-color: #000;
-  color: #fff;
+.arrow_box_0 {
+  border-bottom: 1px dashed #428bca !important;
+  background-color: #428bca !important;
+}
+
+.arrow_box_1 {
+  border-bottom: 1px dashed #f0ad4e !important;
+  background-color: #f0ad4e !important;
+}
+
+.arrow_box_2 {
+  border-bottom: 1px dashed #5bc0de !important;
+  background-color: #5bc0de !important;
+}
+
+.arrow_box_3 {
+  border-bottom: 1px dashed #d9534f !important;
+  background-color: #d9534f !important;
+}
+
+.arrow_target_0 {
+  border: 1px dashed #428bca !important;
+}
+
+.arrow_target_1 {
+  border: 1px dashed #f0ad4e !important;
+}
+
+.arrow_target_2 {
+  border: 1px dashed #d9534f !important;
+}
+
+.arrow_target_3 {
+  border: 1px dashed #5bc0de !important;
+}
+
+.arrow_box_newcard {
+  border-bottom: 0 !important;
+  background-color: rgba(92, 184, 92, 0.2) !important;
+}
+
+.card {
+  padding: 4px 0;
+  background-color: #fff;
+  border-bottom: 1px dashed black;
 }
 
 .cite {
   font-style: italic;
-  border: 1px solid black;
+  border-top: 1px dashed black;
   margin-top: -10px;
-  border-top: none;
   font-variant: small-caps;
-}
-
-.cite.neg {
-  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid white;
+  border-bottom: 1px dashed black;
 }
 
 #header p {
@@ -186,9 +245,22 @@ div.container#card-container {
   z-index: 1;
 }
 
-/*.new_card {
-  background-color: #ccc;
-}*/
+.new_card {
+  padding: 4px 0;
+  border: 1px solid white;
+}
+
+.card-col:first-child .card,
+.card-col:first-child .new_card,
+.card-col:first-child .cite {
+  border-left: 1px solid white;
+}
+
+.card-col:last-child .card,
+.card-col:last-child .new_card,
+.card-col:last-child .cite {
+  border-right: 1px solid white;
+}
 
 #console {
   background-color: gray;
@@ -226,4 +298,9 @@ div.container#card-container {
 
 .modal-text {
   border: 0;
+}
+
+.speechhed.active-speech {
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  background-color: #5cb85c;
 }

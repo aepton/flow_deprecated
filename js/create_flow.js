@@ -1,6 +1,7 @@
 var inNewCard = false;
 var inNewTopic = false;
 var inRoundMeta = false;
+var inTopicDropdown = false;
 var currentSpeech = '1ac';
 var currentTeam = 'aff';
 var currentCard = 1;
@@ -11,6 +12,19 @@ var current_flow_path = '';
 var currentArrowBoxId = 0;
 var arrowBaseId = '';
 var arrowBaseSpeech = '';
+var paper = '';
+var left_paper = 0;
+var top_paper = 0;
+var paper_width = 0;
+var paper_height = 0;
+var arrow_colors = ['#428bca', '#f0ad4e', '#5bc0de', '#d9534f'];
+var all_arrows = [];
+var arrow_highlights = [];
+var targeted_boxes = [];
+var round_init = false;
+var launch_new_topic = true;
+var lastArrowBaseId = '';
+var lastArrowBaseSpeech = '';
 
 var speechOrder = {
   '1ac': {'next': '1nc', 'prev': ''},
@@ -41,9 +55,10 @@ function addTopic() {
     var topic = currentTopicName;
 
     if (topic.length) {
-        var newtopic = $("<option>" + topic.toUpperCase() + "</option>");
+        var newtopic = $(
+          "<li><a href='#' id='topic_" + topic + "' class='menutopic'>" + topic + "</a></li>");
         newtopic.attr("value", topic);
-        $("#topic").append(newtopic);
+        $("#topic-dropdown").append(newtopic);
     }
 
     // Add new topic to global topics dict
@@ -63,7 +78,14 @@ function jumpTopic(topicname) {
     $(".topic" + currentTopicId).hide();
     currentTopicId = topics[topicname];
     $(".topic" + currentTopicId).show()
-    $("#topic").val(topicname);
+    $("#topic").text(topicname);
+    for (var i=0; i < all_arrows.length; i++) {
+      if (all_arrows[i]['topic'] == currentTopicId) {
+        all_arrows[i]['arrow'].show();
+      } else {
+        all_arrows[i]['arrow'].hide();
+      }
+    }
 }
 
 function newCard (speech) {
@@ -97,9 +119,13 @@ function saveCard (speech) {
 
     // Extract text and citation
     var text = $("#new_card_box_" + speech).val();
-    if (!text.length) {
-        setUpNewCardBox(speech);
-        return;
+    try {
+        if (!text.length) {
+            setUpNewCardBox(speech);
+            return;
+        }
+    } catch(err) {
+       ;
     }
     var cite_loc = text.indexOf('\\');
     var cite = '';
@@ -139,7 +165,7 @@ function saveCard (speech) {
 }
 
 function setUpNewCardBox(speech) {
-    var newHtml = '<p class="' + currentTeam + ' new_card current_arrow_box" id="new_' + currentSpeech + '" onclick="">new card</p>';
+    var newHtml = '<p class="' + currentTeam + ' new_card current_arrow_box arrow_box_newcard" id="new_' + currentSpeech + '" onclick="">new card</p>';
     $("#new_card_box_" + speech).parent().append(newHtml);
     $("#new_card_box_" + speech).remove();
     inNewCard = false;
@@ -152,11 +178,12 @@ function setSpeech(speech) {
     } else {
         currentTeam = 'aff';
     }
-    $(".speechhed.aff").css({'background-color': 'white'});
-    $(".speechhed.neg").css({'background-color': 'black'});
-    $(".grid_2").css({'background-color': 'white'});
-    $(".grid_2." + speech).css({'background-color': '#5cb85c'});
-    $(".speechhed." + speech).css({'background-color': '#5cb85c'});
+    /*$(".grid_2").css({'background-color': 'white'});
+    $(".grid_2." + speech).css({'background-color': '#5cb85c'});*/
+    $(".speechhed").each(function() {
+      $(this).removeClass('active-speech');
+    });
+    $(".speechhed." + speech).addClass('active-speech');
 }
 
 function getRoundInfo() {
@@ -189,15 +216,66 @@ function syncToS3() {
     var to_sync = {
         'topics': topics,
         'cards': All_Cards,
-        'round': getRoundInfo()
-    }
+        'round': getRoundInfo(),
+        'arrows': exportArrows()
+    };
     var xhr = new XMLHttpRequest();
     xhr.open('PUT', 'http://myflo.ws.s3.amazonaws.com/rounds/' + currentRoundId, true);
     xhr.setRequestHeader('Content-Type', 'application/jsonp;charset=UTF-8');
     xhr.setRequestHeader('x-amz-grant-read', 'uri=http://acs.amazonaws.com/groups/global/AllUsers');
     xhr.send('f(' + JSON.stringify(to_sync) + ');');
-    $('#rnd-link').html('<a target="_blank" href="http://myflo.ws/view?rnd=' + currentRoundId + '">http://myflo.ws/view?rnd=' + currentRoundId + '</a>');
+    $('#rnd-link').html('<a target="_blank" href="http://myflo.ws/view.html?rnd=' + currentRoundId + '">http://myflo.ws/view?rnd=' + currentRoundId + '</a>');
     $('#saved_round').modal();
+}
+
+function showModal(title, body) {
+    $('#modal-template_label').text(title);
+    $('#modal-contents').html(body);
+    $('#modal-template').modal();
+}
+
+function template(message, data) {
+    if (typeof data === 'undefined') {
+      return _.partial(template, message);
+    } else {
+      return message.replace(/\{\{([^}]+)}}/g, function(s, match) {
+        var result = data;
+        _.each(match.trim().split('.'), function(propertyName) {
+          result = result[propertyName]
+        });
+        return _.escape(result);
+      });
+    }
+}
+
+function syncToLocal() {
+    var to_sync = {
+        'topics': topics,
+        'cards': All_Cards,
+        'round': getRoundInfo(),
+        'arrows': exportArrows()
+    };
+    chrome.storage.sync.get('round_ids', function(result) {
+        var round_ids = result.round_ids;
+        if (!round_ids) {
+            round_ids = {};
+        }
+        round_ids[currentRoundId] = {
+            'round': to_sync['round'],
+            'timestamp': moment()
+        }
+        showModal('Rounds saved to this account',
+            // Template function shouldn't remain in use, too limited/hacky
+            template(
+                $('#local-rounds-template').html(),
+                {
+                    'rounds': round_ids['hxBoXy1MRSXdhpiLP8v6']['round']['affSchool']
+                }
+            )
+        );
+        chrome.storage.sync.set({'round_ids': round_ids}, function() {});
+        chrome.storage.sync.set({currentRoundId: to_sync}, function() {});
+    });
 }
 
 function arrowBoxMove(dir) {
@@ -302,9 +380,67 @@ function arrowBoxMove(dir) {
 }
 
 function arrowBoxMoveChangeHighlight(new_id) {
+    var arrow_box_color = 'arrow_box_newcard';
+    if (currentArrowBoxId.indexOf('new_') == -1) {
+      arrow_box_color = 'arrow_box_' + currentArrowBoxId % arrow_colors.length;
+    }
     $('#' + currentArrowBoxId).removeClass('current_arrow_box');
+    $('#' + currentArrowBoxId).removeClass(arrow_box_color);
     currentArrowBoxId = new_id;
+    arrow_box_color = 'arrow_box_newcard';
+    if (new_id.indexOf('new_') == -1) {
+      arrow_box_color = 'arrow_box_' + new_id % arrow_colors.length;
+    }
     $('#' + currentArrowBoxId).addClass('current_arrow_box');
+    $('#' + currentArrowBoxId).addClass(arrow_box_color);
+    highlightArrows(new_id);
+}
+
+function exportArrows() {
+  var toExport = [];
+  for (var i=0; i < all_arrows.length; i++) {
+    toExport.push({
+      'from': all_arrows[i]['from'],
+      'to': all_arrows[i]['to'],
+      'topic': all_arrows[i]['topic']
+    });
+  }
+  return toExport;
+}
+
+function highlightArrows(new_id) {
+  // Clear out all targeted boxes
+  while (targeted_boxes.length) {
+    var target = targeted_boxes.pop();
+    $('#' + target['id']).removeClass(target['class']);
+  }
+  // Go through all arrows; if one is connected to new_id, make it bolder, otherwise fade it out
+  var found_arrows = false;
+  for (var i=0; i < all_arrows.length; i++) {
+    if (all_arrows[i]['from'] == new_id || all_arrows[i]['to'] == new_id) {
+      found_arrows = true;
+      all_arrows[i]['arrow'].attr({'stroke-opacity': 0.9});
+      if (all_arrows[i]['from'] == new_id) {
+        var target_box = 'arrow_target_' + all_arrows[i]['from'] % arrow_colors.length;
+        $('#' + all_arrows[i]['to']).addClass(target_box);
+        targeted_boxes.push({'id': all_arrows[i]['to'], 'class': target_box});
+      } else {
+        var target_box = 'arrow_target_' + all_arrows[i]['from'] % arrow_colors.length;
+        $('#' + all_arrows[i]['from']).addClass(target_box);
+        targeted_boxes.push({'id': all_arrows[i]['from'], 'class': target_box});
+      }
+    } else {
+      all_arrows[i]['arrow'].attr({'stroke-opacity': 0.2});
+      arrow_highlights.push(all_arrows[i]['arrow']);
+    }
+  }
+  // If we don't have any connected arrows, return everything to its normal opacity
+  if (!found_arrows) {
+    while (arrow_highlights.length) {
+      var arrow = arrow_highlights.pop();
+      arrow.attr({'stroke-opacity': 0.5});
+    }
+  }
 }
 
 function saveRoundMetaData() {
@@ -321,17 +457,62 @@ function saveRoundMetaData() {
     if ($('#neg_team').val()) $('#create_negteam').text($('#neg_team').val());
     if ($('#neg_speaker_1').val()) $('#create_1n').text($('#neg_speaker_1').val());
     if ($('#neg_speaker_2').val()) $('#create_2n').text($('#neg_speaker_2').val());
-    // Launch new topic modal
-    $('#new_topic').modal({
-        keyboard: false,
-        backdrop: 'static'
-    });
-    inNewTopic = true;
 
-    $('#new_topic_close_button').hide();
-    $('#new_topic').on('shown.bs.modal', function(e) {
-        $('#new_topic_name').focus();
-    });
+    if (launch_new_topic) {
+      // Launch new topic modal
+      $('#new_topic').modal({
+          keyboard: false,
+          backdrop: 'static'
+      });
+      $('#new_topic_close_button').hide();
+      $('#new_topic').on('shown.bs.modal', function(e) {
+          launch_new_topic = false;
+      });
+    }
+}
+
+function setupRaphaelPaper() {
+    left_paper = $('#new_1ac').offset()['left'];
+    top_paper = $('#new_1ac').offset()['top'];
+    paper_width = $('#new_2ar').offset()['left'] - left_paper + $('#new_2ar').outerWidth();
+    paper_height = $(window).height() - $('#new_1ac').offset()['top'];
+    paper = Raphael(left_paper, top_paper, paper_width, paper_height);
+}
+
+function drawArrow(from_id, to_id) {
+    if ($('#' + to_id).offset()['left'] < $('#' + from_id).offset()['left']) {
+      var temp = to_id;
+      to_id = from_id;
+      from_id = temp;
+    }
+    var origin_left = $('#' + from_id).offset()['left'] + ($('#' + from_id).outerWidth() * .95) - left_paper;
+    var origin_top = $('#' + from_id).offset()['top'] + ($('#' + from_id).height() / 2) - top_paper;
+    var delta_height = $('#' + to_id).offset()['top'] + ($('#' + to_id).height() / 2) - top_paper - origin_top;
+    var delta_width = $('#' + to_id).offset()['left'] + ($('#' + to_id).outerWidth() * .05) - origin_left - left_paper;
+    // Go some %age of width, then come back another %age, then go back remaining %age
+    var x1 = 0.525 * delta_width;
+    var x2 = -0.05 * delta_width;
+    var x3 = 0.525 * delta_width;
+    // Go up some %age of height 3 times
+    var y1 = 0.25 * delta_height;
+    var y2 = 0.25 * delta_height;
+    var y3 = 0.5 * delta_height;
+    //var arrow = paper.path('M' + origin_left + ',' + origin_top + 't' + x1 + ',' + y1 + ',' + x2 +
+    //                       ',' + y2 + ',' + x3 + ',' + y3);
+    var arrow = paper.path('M' + origin_left + ',' + origin_top + 'l' +
+                           delta_width + ',' + delta_height);
+    if (from_id.indexOf('new_') != -1) {
+      from_id = currentCard + 1;
+    } else if (to_id.indexOf('new_') != -1) {
+      to_id = currentCard + 1;
+    }
+    all_arrows.push({'from': from_id, 'to': to_id, 'arrow': arrow, 'topic': currentTopicId});
+    arrow.attr({'fill': 'none', 'stroke': arrow_colors[from_id % arrow_colors.length], 'stroke-width': 2, 'stroke-opacity': 0.5});
+}
+
+function launchNewTopic() {
+    $('#new_topic').modal({keyboard: true, backdrop: true});
+    $('#new_topic_close_button').show();
 }
 
 $(document).ready(function () {
@@ -355,8 +536,10 @@ $(document).ready(function () {
                         $('#new_topic').modal('hide');
                         $('#new_topic_name').val('');
                         addTopic();
-                        inNewTopic = false;
                     }
+                } else if (inTopicDropdown) {
+                    jumpTopic($(':focus')[0].id.replace(/^topic_/, ''));
+                    $('#topic').dropdown('toggle');
                 } else {
                     arrowBoxMoveChangeHighlight('new_' + currentSpeech);
                     newCard(currentSpeech);
@@ -368,41 +551,58 @@ $(document).ready(function () {
                     $('#' + currentArrowBoxId).addClass('arrow_base');
                     arrowBaseId = currentArrowBoxId;
                     arrowBaseSpeech = currentSpeech;
+                    if (lastArrowBaseId == '') {
+                        lastArrowBaseId = currentArrowBoxId;
+                    } else {
+                        setSpeech(lastArrowBaseSpeech);
+                    }
+                    console.log('moving to ', lastArrowBaseId, 'from', currentArrowBoxId);
+                    arrowBoxMoveChangeHighlight(lastArrowBaseId);
                 } else if (arrowBaseId == currentArrowBoxId) {
                     $('#' + currentArrowBoxId).removeClass('arrow_base');
                     arrowBaseId = '';
                     arrowBaseSpeech = '';
                 } else {
-                    console.log('Draw arrow from', arrowBaseId, 'to', currentArrowBoxId);
-                    console.log('Base:', $('#' + arrowBaseId).offset(), 'S:', $('#' + arrowBaseSpeech + '_col').offset());
-                    console.log('Dst:', $('#' + currentArrowBoxId).offset(), 'S:', $('#' + currentSpeech + '_col').offset());
-                    var e0 = jsPlumb.addEndpoint(arrowBaseSpeech + '_col');
-                    var e1 = jsPlumb.addEndpoint(currentSpeech + '_col');
-                    console.log(e0, e1);
-                    jsPlumb.connect({ source:e0, target:e1, connector:['Straight'] });
+                    lastArrowBaseId = currentArrowBoxId;
+                    lastArrowBaseSpeech = currentSpeech;
+                    drawArrow(arrowBaseId, currentArrowBoxId);
                     $('#' + currentArrowBoxId).removeClass('arrow_base');
-                    arrowBaseId = '';
+                    $('#' + arrowBaseId).removeClass('arrow_base');
+                    arrowBoxMoveChangeHighlight(arrowBaseId);
+                    setSpeech(arrowBaseSpeech);
                     arrowBaseSpeech = '';
+                    arrowBaseId = '';
                 }
                 break;
             case 37: // left
-                if (inNewCard || inNewTopic) return;
+                if (inNewCard || inNewTopic || inTopicDropdown) return;
                 arrowBoxMove('left');
                 break;
 
             case 38: // up
-                if (inNewCard || inNewTopic) return;
+                if (inNewCard || inNewTopic || inTopicDropdown) return;
                 arrowBoxMove('up');
                 break;
 
             case 39: // right
-                if (inNewCard || inNewTopic) return;
+                if (inNewCard || inNewTopic || inTopicDropdown) return;
                 arrowBoxMove('right');
                 break;
 
             case 40: // down
-                if (inNewCard || inNewTopic) return;
+                if (inNewCard || inNewTopic || inTopicDropdown) return;
                 arrowBoxMove('down');
+                break;
+
+            case 78: // n - create new topic
+                if (inNewCard || inNewTopic || inRoundMeta) return;
+                launchNewTopic();
+                break; 
+
+            case 83: // s - toggle topic-selection menu
+                if (inNewCard || inNewTopic || inRoundMeta) return;
+                $('#topic').dropdown('toggle');
+                $('.menutopic:first').focus();
                 break;
 
             // Exit for other keydown events to be captured
@@ -427,30 +627,49 @@ $(document).ready(function () {
         backdrop: 'static'
     });
     inRoundMeta = true;
+    round_init = true;
     $('#round_meta').on('shown.bs.modal', function(e) {
         $('#aff_school').focus();
+        if (round_init) {
+          setupRaphaelPaper();
+        }
+        round_init = false;
     });
     $('#round_meta_submit').click(saveRoundMetaData);
 
-    $('#new_topic_button').click(function() {
-        $('#new_topic').modal({
-            keyboard: true,
-            backdrop: true
-        });
-        inNewTopic = true;
-        $('#new_topic_close_button').show();
-        setTimeout(function() {$('#new_topic_name').focus()}, 750);
+    $('#round_title').click(function() {
+      inRoundMeta = true;
+      $('#round_meta').modal({
+        keyboard: false,
+        backdrop: 'static'
+      });
     });
 
+    $('#new_topic_button').click(launchNewTopic);
+    $('#new_topic').on('shown.bs.modal', function(e) {
+        inNewTopic = true;
+        $('#new_topic_name').focus();
+    });
+    $('#new_topic').on('hidden.bs.modal', function(e) {
+        inNewTopic = false;
+    });
+    $('#topic-dropdown-parent').on('shown.bs.dropdown', function(e) {
+        inTopicDropdown = true;
+    });
+    $('#topic-dropdown-parent').on('hidden.bs.dropdown', function(e) {
+        inTopicDropdown = false;
+    });
+    
     $('#sync_button').click(function() {
         $('#sync_button').toggleClass('btn-primary btn-success');
         syncToS3();
+        //syncToLocal();
     });
 
     // Handle user selection of different topic
-    $("#topic").change(function (){
-        var selected = $(this).children(":selected").attr("value");
-        jumpTopic(selected);
+    $(document).on('click', '.dropdown-menu li a', function () {
+      var selected = $(this).text();
+      jumpTopic(selected);
     });
 
     // Handle user selection of different speech

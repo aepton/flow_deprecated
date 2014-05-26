@@ -3,7 +3,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
     'width': 1400,
     'height': 1000,
     'state': 'maximized',
-    'frame': 'none'
+    'frame': 'none',
   });
 });
 
