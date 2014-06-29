@@ -35,8 +35,63 @@ p {
   text-align: center;
 }
 
-textarea {
+.typeahead {
   width: 100%;
+}
+
+textarea {
+  overflow-y: auto;
+  border-radius: 4px;
+  border: 1px solid rgba(92, 184, 92, 1.0);
+  box-shadow: none;
+  outline: none;
+  height: 6em;
+}
+
+.tt-dropdown-menu {
+  overflow-y: auto;
+  height: 450px;
+  background-color: rgba(92, 184, 92, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(92, 184, 92, 1.0);
+  border-top: none !important;
+  width: 136px !important;
+}
+
+.tt-suggestion > p, .tt-cursor > p {
+  width: 136px !important;
+}
+
+.tt-cursor > p {
+  background-color: rgba(92, 184, 92, 0.3);
+  border-radius: 4px;
+  width: 136px;
+  margin-left: -1px;
+}
+
+[data-card-hash]:after {
+  content: "\e034";
+  position: relative;
+  right: 0px;
+  color: rgba(92, 184, 92, 1.0);
+  font-family: 'Glyphicons Halflings';
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1;
+  font-size: 0.9em;
+  -webkit-font-smoothing: antialiased;
+}
+
+#card_expand {
+  width: 1152px !important;
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.9);
+  left: 0px;
+  z-index: 995;
+}
+
+#card_expand > p {
+  overflow: visible;
 }
 
 div.container {
@@ -50,10 +105,12 @@ div.container#top {
   background-color: white;
   height: 130px;
   z-index: 999;
+  top: 0px;
 }
 
 div.container#card-container {
   margin-top: 145px;
+  height: 1400px;
 }
 
 .container_16 {
@@ -126,7 +183,11 @@ div.container#card-container {
 #header {
   border: none;
   margin-top: 3em;
-  z-index: 5;
+  z-index: 999;
+}
+
+.flag-instructions {
+  color: rgba(92, 184, 92, 1.0);
 }
 
 #background_blocker {

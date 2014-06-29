@@ -2,6 +2,7 @@ var inNewCard = false;
 var inNewTopic = false;
 var inRoundMeta = false;
 var inTopicDropdown = false;
+var inInstructions = false;
 var currentSpeech = '1ac';
 var currentTeam = 'aff';
 var currentCard = 1;
@@ -25,6 +26,9 @@ var round_init = false;
 var launch_new_topic = true;
 var lastArrowBaseId = '';
 var lastArrowBaseSpeech = '';
+var typeaheadCards = null;
+var typeahead = null;
+var cardHashed = {};
 
 var speechOrder = {
   '1ac': {'next': '1nc', 'prev': ''},
@@ -94,7 +98,18 @@ function newCard (speech) {
     var boxId = "new_card_box_" + speech;
 
     if (!$("#" + boxId).length) {
-        $("#new_" + speech).replaceWith('<textarea id="' + boxId + '" placeholder="Enter card text. Separate cite with \\"></textarea>');
+        $("#new_" + speech).replaceWith('<textarea class="typeahead" id="' + boxId + '" placeholder="Enter card text. Separate cite with \\"></textarea>');
+        if (cardHashed) {
+            typeAhead = $('#' + boxId).typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1
+            }, {
+                name: 'cards',
+                displayKey: 'tag',
+                source: typeaheadCards.ttAdapter()
+            });
+        }
         $("#" + boxId).focus();
         $("#" + boxId).focusout(function () { saveCard(speech); });
     }
@@ -121,6 +136,7 @@ function saveCard (speech) {
     var text = $("#new_card_box_" + speech).val();
     try {
         if (!text.length) {
+            $('.typeahead').typeahead('destroy');
             setUpNewCardBox(speech);
             return;
         }
@@ -129,17 +145,36 @@ function saveCard (speech) {
     }
     var cite_loc = text.indexOf('\\');
     var cite = '';
+    var hash = '';
     if (cite_loc != -1) {
         cite = text.substr(cite_loc + 1, text.length);
         text = text.substr(0, cite_loc);
+        hash = '';
+    } else {
+        cite_loc = text.indexOf('<br>');
+        if (cite_loc != -1) {
+            hash_loc = text.indexOf('<span');
+            cite = text.substr(cite_loc + 4, hash_loc - cite_loc + 4);
+            hash = text.substr(hash_loc + 10);
+            end_hash_loc = hash.indexOf("'>");
+            hash = hash.substr(0, end_hash_loc);
+            text = text.substr(0, cite_loc);
+        }
     }
+
 
     // Visually update page with new card
     currentCard += 1;
     var topicId = currentTopicId;
     var cardId = "#new_card_box_" + speech;
 
-    $(cardId).parent().append('<p class="debate_cell card topic' + topicId + ' ' + currentTeam + '" id="' + currentCard + '">' + text + '</p><span class="cardNum">' + (currentCard - 1) + '</span>');
+    $('.typeahead').typeahead('destroy');
+
+    var hash_str = '"';
+    if (hash) {
+        hash_str = '" data-card-hash="' + hash + '"';
+    }
+    $(cardId).parent().append('<p class="debate_cell card topic' + topicId + ' ' + currentTeam + '" id="' + currentCard + hash_str + '>' + text + '</p><span class="cardNum">' + (currentCard - 1) + '</span>');
     if (cite_loc != -1){
         $(cardId).parent().append('<p class="debate_cell topic' + topicId + ' ' + currentTeam + ' cite" id="' + currentCard + '_cite">' + cite + '</p>');
         $("#" + currentCard + "_cite").click(function(event) {
@@ -528,6 +563,11 @@ $(document).ready(function () {
         }
         switch(e.which) {
             case 13: // enter
+                if (inInstructions) {
+                    inInstructions = false;
+                    $('#instructions').modal('hide');
+                    return;
+                }
                 if (inNewCard){
                     saveCard(currentSpeech);
                 } else if (inNewTopic) {
@@ -594,6 +634,34 @@ $(document).ready(function () {
                 arrowBoxMove('down');
                 break;
 
+            case 69: // e - expand to full text of card
+                if (inNewCard || inNewTopic || inRoundMeta) return;
+                try {
+                  console.log($('#card_expand'));
+                  if ($('#card_expand').length) {
+                      $('#card_expand').remove();
+                  } else {
+                      var card_data = cardHashed[$('#' + currentArrowBoxId).data()['cardHash']];
+                      var cite_append = '#' + currentArrowBoxId;
+                      if ($(cite_append + '_cite').length) {
+                          cite_append = cite_append + '_cite';
+                      }
+                      if (card_data) {
+                          $('<div id="card_expand"><p id="card_cite_extras"></p><p id="card_text"></p></div>').insertAfter(cite_append);
+                          $('#card_cite_extras').text(card_data.cite_extras.join('<br>'));
+                          $('#card_text').html(card_data.text);
+                          var left = $('#new_1ac').offset()['left'];
+                          var dist = $('#card_expand').offset()['left'] - left;
+                          if (dist > 0) {
+                              $('#card_expand').css('left', '-' + dist + 'px');
+                          }
+                      }
+                  }
+                } catch (err) {
+                  ;
+                }
+                break;
+
             case 78: // n - create new topic
                 if (inNewCard || inNewTopic || inRoundMeta) return;
                 launchNewTopic();
@@ -621,13 +689,19 @@ $(document).ready(function () {
         }
     });
 
-    // Launch round meta modal immediately
-    $('#round_meta').modal({
-        keyboard: false,
-        backdrop: 'static'
+    // Optionally show instructions
+    $('#instructions').modal();
+    inInstructions = true;
+    $('#instructions').on('hidden.bs.modal', function(e) {
+        // Launch round meta modal immediately
+        $('#round_meta').modal({
+            keyboard: false,
+            backdrop: 'static'
+        });
+        inRoundMeta = true;
+        round_init = true;
     });
-    inRoundMeta = true;
-    round_init = true;
+
     $('#round_meta').on('shown.bs.modal', function(e) {
         $('#aff_school').focus();
         if (round_init) {
@@ -681,4 +755,30 @@ $(document).ready(function () {
         }
         setSpeech(card_id);
     });
+
+    // Set up typeahead
+    typeaheadCards = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('tag'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 30,
+        prefetch: {
+            url: '/js/json/corefiles.json',
+            filter: function(list) {
+                return $.map(list, function(card) {
+                    cardHashed[card.hash] = {
+                        tag: card.tag,
+                        cite: card.cite,
+                        cite_extras: card.cite_extras,
+                        text: card.text
+                    }
+                    return {
+                        tag: card.tag + " <br> " + card.cite + " <span id='" + card.hash + "'></span>",
+                        cite: card.cite
+                    };
+                });
+            }
+        }
+    });
+ 
+    typeaheadCards.initialize();
 });

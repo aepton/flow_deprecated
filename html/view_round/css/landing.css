@@ -32,6 +32,10 @@ a.link, a.link:hover, a.link:active, a.link:visited {
   color: #5cb85c;
 }
 
+a.round-link, a.round-link:hover, a.round-link:active, a.round-link:visited {
+  color: #777;
+}
+
 .carousel {
   margin-left: 10%;
   margin-right: 10%;

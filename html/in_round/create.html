@@ -15,6 +15,7 @@
 <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/libs/raphael-min.js"></script>
 <script type="text/javascript" src="/js/libs/moment.min.js"></script>
+<script type="text/javascript" src="/js/libs/typeahead.bundle.js"></script>
 <script type="text/javascript" src="/js/create_flow.js"></script>
 </head>
 <body>
@@ -118,7 +119,7 @@
         <h4 class="modal-title" id="new_topic_label">Add new topic</h4>
       </div>
       <div class="modal-body">
-       <input type="text" id="new_topic_name" class="form-control" placeholder="Inherency, Federalism, etc - hit enter to save">
+       <input type="text" id="new_topic_name" class="form-control" placeholder="Inherency, Federalism, etc - hit enter to save (you gotta type something, sorry)">
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -212,6 +213,73 @@
       </div>
       <div class="modal-body">
         <p id="modal-contents"></p>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" id="instructions" tabindex="-1" role="dialog" aria-labelledby="modal-template" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" id="modal-template_close_button" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">How it works</h4>
+      </div>
+      <div class="modal-body">
+          <div class="container">
+              <div class="row">
+                  <div class="col-md-12">
+                      Welcome to...this flowing thing! Enter round info on the next screen if you want, then enter the name of the first topic, like Inherency or Harms. From there, highlight a [new card] box and hit enter, then hit enter again to save the card. If you select a card from the dropdown, you'll be able to see the full text of the card later.
+                  </div>
+              </div>
+              <hr>
+              <div class="row">
+                  <div class="col-md-12">
+                      <i class="glyphicon glyphicon-arrow-up"></i>,<i class="glyphicon glyphicon-arrow-down"></i>,<i class="glyphicon glyphicon-arrow-left"></i>,<i class="glyphicon glyphicon-arrow-right"></i>:
+                      Move highlight box, in order to create new cards or draw arrows
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12">
+                      ENT:
+                      Opens the card-editing box, or saves the current card if already open
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12">
+                      SPA:
+                      Sets the origin box, or draws an arrow if an origin is already selected
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12">
+                      e:
+                      If a box with a <i class="glyphicon glyphicon-flag flag-instructions"></i> is highlighted, expands or hides the full card
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12">
+                      n:
+                      Launches <b>n</b>ew-topic dialog
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12">
+                      s:
+                      Toggles topic-<b>s</b>election menu
+                  </div>
+              </div>
+              <hr>
+              <div class="col-md-12">
+                  Hit [Sync] to save the round to the web, or update the current saved round.
+                  <br><br>
+                  The card database comes from the <a href="http://chicagodebateleague.org/">Chicago Debate League</a>'s <a href="http://chicagodebateleague.org/cdl-core-files/">2013-14 core files</a>, shoutout to an awesome league! I'll update it with the 2014-15 season case list when it becomes available. The file's about 1MB, so it might take a minute to load.
+                  <br><br>
+                  Questions/comments/etc, <a href="mailto:abe@epton.org">email Abe</a>. Code's on <a href="https://github.com/aepton/flow">Github</a>.
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-dismiss="modal">Got it</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

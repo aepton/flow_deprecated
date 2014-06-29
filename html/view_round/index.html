@@ -36,11 +36,11 @@
           </div>
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#">App</a></li>
-              <li class="dropdown">
+              <li class="active"><a href="#" id="show-app">App</a></li>
+              <li class="dropdown" id="rounds-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Flows <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Most Recent</a></li>
+                  <li><a href="#" id="most-recent">Most Recent</a></li>
                   <li class="divider"></li>
                   <li role="presentation" class="dropdown-header">Coming Soon</li>
                   <li><a href="#">By Tournament</a></li>
@@ -55,8 +55,10 @@
         </div><!--/.container-fluid -->
       </div>
 
-      <!-- Main component for a primary marketing message or call to action -->
-      <div class="jumbotron">
+      <div id="rounds-view" style="display:none">
+      </div>
+
+      <div class="jumbotron" id="app-view">
         <h1>Flow</h1>
         <div class="container-fluid">
           <div class="row">
@@ -111,7 +113,10 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="/js/front.js"></script>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -119,6 +124,41 @@
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
       ga('create', 'UA-29485819-3', 'myflo.ws');
       ga('send', 'pageview');
+    </script>
+    <script type="text/template" id="rounds-template">
+        <div class="container-fluid">
+            <% _.each(rounds, function(round, index, list) { %>
+                <a class="round-link" href="http://myflo.ws/view.html?rnd=<%= round['key'] %>">
+                    <div class="row">
+                        <div class="col-md-offset-3 col-md-3">
+                            <%= round['data']['affSchool'] %> <%= round['data']['affTeam'] %> (aff)
+                        </div>
+                        <div class="col-md-1">
+                            <i>vs</i>
+                        </div>
+                        <div class="col-md-3">
+                            <%= round['data']['negSchool'] %> <%= round['data']['negTeam'] %> (neg)
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-offset-3 col-md-3">
+                            <%= round['data']['1a'] %> and <%= round['data']['2a'] %>
+                        </div>
+                        <div class="col-md-1">
+                        </div>
+                        <div class="col-md-3">
+                            <%= round['data']['1n'] %> and <%= round['data']['2n'] %>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-md-offset-5">
+                            <i>Last updated <%= moment(round['last_modified']).fromNow() %></i>
+                        </div>
+                    </div>
+                </a>
+                <hr>
+            <% }); %>
+        </div>
     </script>
   </body>
 </html>

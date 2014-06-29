@@ -77,10 +77,10 @@ function processParams() {
 }
 
 function jumpTopic(topicname) {
-  $(".topic" + currentTopicId).hide();
-  currentTopicId = topics[topicname];
-  $(".topic" + currentTopicId).show()
-  $("#topic").val(topicname);
+    $(".topic" + currentTopicId).hide();
+    currentTopicId = topics[topicname];
+    $(".topic" + currentTopicId).show()
+    $("#topic").text(topicname);
 }
 
 function createArrow(card_id) {
@@ -167,10 +167,11 @@ function setTopics(new_topics) {
   }
   sortable.sort(function (a, b) {return a[1] - b[1]});
   for (var s = 0; s < sortable.length; s++) {
-    var nt = $('<option>' + sortable[s][0].toUpperCase() + '</option>');
-    nt.attr('value', sortable[s][0]);
-    $('#topic').append(nt);
-    topics[sortable[s][0]] = sortable[s][1];
+    var newtopic = $(
+      "<li><a href='#' id='topic_" + sortable[s][0] + "' class='menutopic'>" + sortable[s][0] + "</a></li>");
+    newtopic.attr("value", sortable[s][0]);
+    $("#topic-dropdown").append(newtopic);
+    topics[sortable[s][0]] = s + 1;
   }
   first_topic = sortable[0][0];
 }
