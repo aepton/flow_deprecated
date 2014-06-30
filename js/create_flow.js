@@ -197,6 +197,9 @@ function saveCard (speech) {
     card.save();
     All_Cards.add([card]);
     setUpNewCardBox(speech);
+    $("html, body").animate({
+      scrollTop: ($('#new_' + currentSpeech).offset()['top'] - $('#top').height() - 100)
+    }, 300, 'swing');
 }
 
 function setUpNewCardBox(speech) {
@@ -637,7 +640,6 @@ $(document).ready(function () {
             case 69: // e - expand to full text of card
                 if (inNewCard || inNewTopic || inRoundMeta) return;
                 try {
-                  console.log($('#card_expand'));
                   if ($('#card_expand').length) {
                       $('#card_expand').remove();
                   } else {
