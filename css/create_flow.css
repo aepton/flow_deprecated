@@ -35,6 +35,10 @@ p {
   text-align: center;
 }
 
+svg {
+  pointer-events: none;
+}
+
 .typeahead {
   width: 100%;
 }

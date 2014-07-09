@@ -3,6 +3,7 @@ var inNewTopic = false;
 var inRoundMeta = false;
 var inTopicDropdown = false;
 var inInstructions = false;
+var editingCard = '';
 var currentSpeech = '1ac';
 var currentTeam = 'aff';
 var currentCard = 1;
@@ -118,13 +119,14 @@ function newCard (speech) {
 function editCard (card_id, speech) {
     setSpeech(speech);
     inNewCard = true;
+    editingCard = card_id;
 
     if ($("#" + card_id).html().length) {
         var existing_contents = $("#" + card_id).html();
         if ($("#" + card_id + "_cite").length) {
             existing_contents += "\\" + $("#" + card_id + "_cite").html();
         }
-        $("#" + card_id).replaceWith('<textarea id="' + card_id + '">' + existing_contents + '</textarea>');
+        $("#" + card_id).replaceWith('<textarea id="new_card_box_' + speech + '">' + existing_contents + '</textarea>');
         $("#" + card_id).focus();
     }
 }
@@ -162,6 +164,19 @@ function saveCard (speech) {
         }
     }
 
+    var hash_str = '"';
+    if (hash) {
+        hash_str = '" data-card-hash="' + hash + '"';
+    }
+
+    if (editingCard) {
+      $('#new_card_box_' + speech).replaceWith('<p class="debate_cell card topic' + currentTopicId + ' ' + currentTeam + '" id="' + editingCard + hash_str + '>' + text + '</p><span class="cardNum">' + editingCard + '</span>');
+      $("#" + editingCard).click(function(event) {
+        editCard(currentCard, speech);
+      });
+      editingCard = '';
+      return;
+    }
 
     // Visually update page with new card
     currentCard += 1;
@@ -170,10 +185,6 @@ function saveCard (speech) {
 
     $('.typeahead').typeahead('destroy');
 
-    var hash_str = '"';
-    if (hash) {
-        hash_str = '" data-card-hash="' + hash + '"';
-    }
     $(cardId).parent().append('<p class="debate_cell card topic' + topicId + ' ' + currentTeam + '" id="' + currentCard + hash_str + '>' + text + '</p><span class="cardNum">' + (currentCard - 1) + '</span>');
     if (cite_loc != -1){
         $(cardId).parent().append('<p class="debate_cell topic' + topicId + ' ' + currentTeam + ' cite" id="' + currentCard + '_cite">' + cite + '</p>');
