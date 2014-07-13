@@ -1,6 +1,6 @@
 function arrowBoxMove(dir) {
     if (dir == 'up' || dir == 'down') {
-        var cards = $('.' + currentSpeech + ' > .topic' + currentTopicId);
+        var cards = $('.' + currentSpeech + ' > .card.topic' + currentTopicId);
         // If there aren't any cards, can't move up or down
         if (!cards.length) {
             return;
@@ -37,9 +37,9 @@ function arrowBoxMove(dir) {
     } else if (dir == 'left' || dir == 'right') {
         var cards = [];
         if (dir == 'right' && speechOrder[currentSpeech]['next'] != '') {
-            cards = $('.' + speechOrder[currentSpeech]['next'] + '> .topic' + currentTopicId);
+            cards = $('.' + speechOrder[currentSpeech]['next'] + '> .card.topic' + currentTopicId);
         } else if (dir == 'left' && speechOrder[currentSpeech]['prev'] != '') {
-            cards = $('.' + speechOrder[currentSpeech]['prev'] + '> .topic' + currentTopicId);
+            cards = $('.' + speechOrder[currentSpeech]['prev'] + '> .card.topic' + currentTopicId);
         } else {
             // Can't go any farther, no more speeches in that direction
             return;
@@ -87,7 +87,7 @@ function arrowBoxMove(dir) {
             return;
         } else {
             // Pick the card with smallest distance between current card top
-            // and it's top; if a tie, go with the lower one (arbitrary)
+            // and its top; if a tie, go with the lower one (arbitrary)
             var preDist = currTop - $('#' + cards[preTop].id).offset().top;
             var postDist = $('#' + cards[postTop].id).offset().top - currTop;
             if (preDist < postDist) {
@@ -102,17 +102,23 @@ function arrowBoxMove(dir) {
 function arrowBoxMoveChangeHighlight(new_id) {
     var arrow_box_color = 'arrow_box_newcard';
     if (currentArrowBoxId.indexOf('new_') == -1) {
-      arrow_box_color = 'arrow_box_' + currentArrowBoxId % arrow_colors.length;
+      arrow_box_color = 'arrow_box_basic';
     }
     $('#' + currentArrowBoxId).removeClass('current_arrow_box');
     $('#' + currentArrowBoxId).removeClass(arrow_box_color);
+    if ($('#' + currentArrowBoxId + '_cite').length) {
+      $('#' + currentArrowBoxId + '_cite').removeClass(arrow_box_color);
+    }
     currentArrowBoxId = new_id;
     arrow_box_color = 'arrow_box_newcard';
     if (new_id.indexOf('new_') == -1) {
-      arrow_box_color = 'arrow_box_' + new_id % arrow_colors.length;
+      arrow_box_color = 'arrow_box_basic';
     }
     $('#' + currentArrowBoxId).addClass('current_arrow_box');
     $('#' + currentArrowBoxId).addClass(arrow_box_color);
+    if ($('#' + currentArrowBoxId + '_cite').length) {
+      $('#' + currentArrowBoxId + '_cite').addClass(arrow_box_color);
+    }
     highlightArrows(new_id);
 }
 
@@ -141,11 +147,11 @@ function highlightArrows(new_id) {
       found_arrows = true;
       all_arrows[i]['arrow'].attr({'stroke-opacity': 0.9});
       if (all_arrows[i]['from'] == new_id) {
-        var target_box = 'arrow_target_' + all_arrows[i]['from'] % arrow_colors.length;
+        var target_box = 'arrow_target';
         $('#' + all_arrows[i]['to']).addClass(target_box);
         targeted_boxes.push({'id': all_arrows[i]['to'], 'class': target_box});
       } else {
-        var target_box = 'arrow_target_' + all_arrows[i]['from'] % arrow_colors.length;
+        var target_box = 'arrow_target';
         $('#' + all_arrows[i]['from']).addClass(target_box);
         targeted_boxes.push({'id': all_arrows[i]['from'], 'class': target_box});
       }

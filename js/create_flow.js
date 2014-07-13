@@ -19,11 +19,11 @@ var left_paper = 0;
 var top_paper = 0;
 var paper_width = 0;
 var paper_height = 0;
-var arrow_colors = ['#428bca', '#f0ad4e', '#5bc0de', '#d9534f'];
+var arrow_colors = ['#5cb85c'];
 var all_arrows = [];
 var arrow_highlights = [];
 var targeted_boxes = [];
-var round_init = false;
+var round_init = true;
 var launch_new_topic = true;
 var lastArrowBaseId = '';
 var lastArrowBaseSpeech = '';
@@ -64,13 +64,20 @@ $(document).ready(function () {
     $('#instructions').modal();
     inInstructions = true;
     $('#instructions').on('hidden.bs.modal', function(e) {
-        // Launch round meta modal immediately
-        $('#round_meta').modal({
+        inInstructions = false;
+        if (round_init) {
+          // Launch round meta modal immediately
+          $('#round_meta').modal({
             keyboard: false,
             backdrop: 'static'
-        });
-        inRoundMeta = true;
-        round_init = true;
+          });
+          inRoundMeta = true;
+        }
+    });
+
+    $('#help_button').click(function() {
+      inInstructions = true;
+      $('#instructions').modal();
     });
 
     $('#round_meta').on('shown.bs.modal', function(e) {
@@ -84,10 +91,7 @@ $(document).ready(function () {
 
     $('#round_title').click(function() {
       inRoundMeta = true;
-      $('#round_meta').modal({
-        keyboard: false,
-        backdrop: 'static'
-      });
+      $('#round_meta').modal();
     });
 
     $('#new_topic_button').click(launchNewTopic);
@@ -104,7 +108,7 @@ $(document).ready(function () {
     $('#topic-dropdown-parent').on('hidden.bs.dropdown', function(e) {
         inTopicDropdown = false;
     });
-    
+
     $('#sync_button').click(function() {
         $('#sync_button').toggleClass('btn-primary btn-success');
         syncToS3();
